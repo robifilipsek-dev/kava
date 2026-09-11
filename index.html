@@ -409,7 +409,6 @@
     <div class="status-box">
         <span id="statusSubtitle">Danes je na vrsti za kavo:</span>
         <strong id="currentPersonName">-</strong>
-        <div id="nextPersonSubtext" class="next-person-info" style="display: none;"></div>
         <div class="action-buttons">
             <button class="btn btn-confirm" onclick="confirmMyCoffee()">✅ Potrjujem rundo</button>
             <button class="btn btn-cant" onclick="cantGiveCoffee()">❌ Danes ne morem</button>
@@ -933,13 +932,23 @@
         if (confirm(`Ali potrjuješ, da ${loggedInUser} danes prostovoljno časti kavo?`)) {
             performCloudAction(() => {
                 saveStateSnapshot();
+                // Kdo bi moral biti danes na vrsti PRED to častitko
+                const rightfulNext = getNextEligiblePerson();
+                const isInTurn = (loggedInUser === rightfulNext);
+
                 counts[loggedInUser] = (counts[loggedInUser] || 0) + 1;
                 currentRoundPaid[loggedInUser] = true;
                 todayPayer = loggedInUser;
                 dailyUnavailable[loggedInUser] = false;
                 
                 checkRoundCompletion();
-                advanceToNextEligiblePerson();
+
+                // Vrsto pomaknemo naprej samo, če je častil tisti, ki je bil dejansko na vrsti.
+                // Če je nekdo počastil izven vrstnega reda, ostane oseba, ki bi morala
+                // danes dati za kavo, še vedno naslednja na vrsti.
+                if (isInTurn) {
+                    advanceToNextEligiblePerson();
+                }
 
                 renderUI();
             }, (success) => {
@@ -988,23 +997,15 @@
         
         const subtitleEl = document.getElementById('statusSubtitle');
         const nameEl = document.getElementById('currentPersonName');
-        const subtextEl = document.getElementById('nextPersonSubtext');
 
         if (todayPayer) {
             subtitleEl.innerText = "⭐ Danes potrjeno časti:";
             nameEl.innerText = todayPayer;
             nameEl.style.color = "var(--accent)";
-            if (subtextEl) {
-                subtextEl.style.display = "block";
-                subtextEl.innerText = `Naslednji na vrsti za kavo (jutri): ${nextPerson}`;
-            }
         } else {
             subtitleEl.innerText = "Danes je na vrsti za kavo:";
             nameEl.innerText = nextPerson;
             nameEl.style.color = "var(--text-bright)";
-            if (subtextEl) {
-                subtextEl.style.display = "none";
-            }
         }
 
         document.getElementById('settingsBtn').style.display = (loggedInUser === "Filipšek") ? 'flex' : 'none';
