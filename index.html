@@ -407,7 +407,7 @@
     </div>
 
     <div class="status-box">
-        <span id="statusSubtitle">Danes je na vrsti za kavo:</span>
+        <span id="statusSubtitle">Na vrsti za kavo:</span>
         <strong id="currentPersonName">-</strong>
         <div class="action-buttons">
             <button class="btn btn-confirm" onclick="confirmMyCoffee()">✅ Potrjujem rundo</button>
@@ -701,25 +701,34 @@
         return !absent[name] && !dailyUnavailable[name];
     }
 
+    // Poišče indeks "najbolj pravičnega" upravičenega člana za naslednjo rundo:
+    // prednost ima tisti z manj rundami (counts), pri izenačenju pa vrstni red rotacije
+    // (najbližji naprej od currentIndex). Če requireUnpaid=true, upošteva samo tiste,
+    // ki v tem krogu (currentRoundPaid) še niso plačali.
+    function findFairestEligibleIndex(requireUnpaid) {
+        if (team.length === 0) return -1;
+        let candidates = [];
+        for (let i = 0; i < team.length; i++) {
+            let idx = (currentIndex + i) % team.length;
+            let name = team[idx];
+            if (!isPersonValid(name)) continue;
+            if (requireUnpaid && currentRoundPaid[name]) continue;
+            candidates.push({ idx, order: i, count: counts[name] || 0 });
+        }
+        if (candidates.length === 0) return -1;
+        candidates.sort((a, b) => (a.count !== b.count) ? a.count - b.count : a.order - b.order);
+        return candidates[0].idx;
+    }
+
     function getNextEligiblePerson() {
         if (team.length === 0) return "-";
         clampIndex();
 
-        for (let i = 0; i < team.length; i++) {
-            let idx = (currentIndex + i) % team.length;
-            let name = team[idx];
-            if (isPersonValid(name) && !currentRoundPaid[name]) {
-                return name;
-            }
-        }
+        let idx = findFairestEligibleIndex(true);
+        if (idx !== -1) return team[idx];
 
-        for (let i = 0; i < team.length; i++) {
-            let idx = (currentIndex + i) % team.length;
-            let name = team[idx];
-            if (isPersonValid(name)) {
-                return name;
-            }
-        }
+        idx = findFairestEligibleIndex(false);
+        if (idx !== -1) return team[idx];
 
         return "-";
     }
@@ -728,28 +737,28 @@
         if (team.length === 0) return;
         clampIndex();
 
-        for (let i = 1; i <= team.length; i++) {
-            let idx = (currentIndex + i) % team.length;
-            let name = team[idx];
-            if (isPersonValid(name) && !currentRoundPaid[name]) {
-                currentIndex = idx;
-                return;
-            }
-        }
+        let idx = findFairestEligibleIndex(true);
+        if (idx !== -1) { currentIndex = idx; return; }
 
-        for (let i = 1; i <= team.length; i++) {
-            let idx = (currentIndex + i) % team.length;
-            if (isPersonValid(team[idx])) {
-                currentIndex = idx;
-                return;
-            }
-        }
+        idx = findFairestEligibleIndex(false);
+        if (idx !== -1) { currentIndex = idx; return; }
     }
 
     function checkRoundCompletion() {
         const activeMembers = team.filter(m => !absent[m]);
         if (activeMembers.length > 0 && activeMembers.every(m => currentRoundPaid[m])) {
             team.forEach(m => { currentRoundPaid[m] = false; });
+
+            // Kdor je trenutno na daljšem dopustu/bolniški (absent), je ravnokar "zamudil"
+            // cel krog rund ostalih. Da po vrnitvi ne bo v zaostanku (in posledično
+            // nesorazmerno pogosto na vrsti zaradi manjšega št. rund), se mu za vsak
+            // tak zamujen krog samodejno prišteje ena runda.
+            team.forEach(m => {
+                if (absent[m]) {
+                    counts[m] = (counts[m] || 0) + 1;
+                }
+            });
+
             return true;
         }
         return false;
@@ -1003,7 +1012,7 @@
             nameEl.innerText = todayPayer;
             nameEl.style.color = "var(--accent)";
         } else {
-            subtitleEl.innerText = "Danes je na vrsti za kavo:";
+            subtitleEl.innerText = "Na vrsti za kavo:";
             nameEl.innerText = nextPerson;
             nameEl.style.color = "var(--text-bright)";
         }
@@ -1035,10 +1044,10 @@
                 statusText = "⭐ Častil danes";
             } else if (isNext) {
                 cardClass += " is-next";
-                statusText = "👉 Na vrsti danes";
+                statusText = "👉 Na vrsti";
             } else if (isTodayPaid) {
                 cardClass += " is-paid";
-                statusText = "✅ Že dal v tem krogu";
+                statusText = "✅ Že dal";
             }
 
             const roundCount = counts[name] || 0;
