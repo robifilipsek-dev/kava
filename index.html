@@ -745,8 +745,13 @@
     }
 
     function checkRoundCompletion() {
-        const activeMembers = team.filter(m => !absent[m]);
-        if (activeMembers.length > 0 && activeMembers.every(m => currentRoundPaid[m])) {
+        // Krog velja za zaključen, ko so vsi trenutno RAZPOLOŽLJIVI člani (torej
+        // niso ne dolgotrajno odsotni ne danes nedostopni) plačali svojo rundo.
+        // Če ravno zadnji "dolžnik" postane nedostopen/odsoten, se krog kljub temu
+        // pravilno zaključi in začne nov krog - namesto da bi vrsta pomotoma skočila
+        // na nekoga, ki je to rundo že plačal.
+        const availableMembers = team.filter(isPersonValid);
+        if (availableMembers.length > 0 && availableMembers.every(m => currentRoundPaid[m])) {
             team.forEach(m => { currentRoundPaid[m] = false; });
 
             // Kdor je trenutno na daljšem dopustu/bolniški (absent), je ravnokar "zamudil"
@@ -921,6 +926,7 @@
                 dailyUnavailable[active] = true; 
                 currentRoundPaid[active] = false;
                 
+                checkRoundCompletion();
                 advanceToNextEligiblePerson(); 
                 renderUI();
             }, (success) => {
@@ -983,11 +989,9 @@
         performCloudAction(() => {
             saveStateSnapshot();
             dailyUnavailable[name] = !dailyUnavailable[name];
-            
-            const nextPerson = getNextEligiblePerson();
-            if (nextPerson === name && dailyUnavailable[name]) {
-                advanceToNextEligiblePerson();
-            }
+
+            checkRoundCompletion();
+            advanceToNextEligiblePerson();
             renderUI();
         });
     }
@@ -1221,6 +1225,9 @@
             teamsMsgSponsor = document.getElementById('teamsMsgSponsorInput').value.trim();
             teamsMsgInvite = document.getElementById('teamsMsgInviteInput').value.trim();
             gridColumnsSetting = document.getElementById('gridColumnsSelect').value;
+
+            checkRoundCompletion();
+            advanceToNextEligiblePerson();
 
             saveLocalStorage();
         }, (success) => {
