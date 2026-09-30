@@ -55,7 +55,7 @@
 
         .cup-icon { width: 1em; height: 1em; display: inline-block; flex-shrink: 0; vertical-align: -0.16em; color: var(--text); }
         .cup-icon.lg { width: 26px; height: 26px; vertical-align: middle; }
-        .cup-icon.sm { width: 12px; height: 12px; color: var(--accent); vertical-align: -2px; }
+        .cup-icon.sm { width: 17px; height: 14px; color: var(--accent); vertical-align: middle; overflow: visible; }
 
         .header {
             display: flex;
@@ -155,8 +155,9 @@
         .btn-confirm { background: var(--accent); color: #0f172a; }
         .btn-confirm:hover { background: #34d399; }
 
-        .btn-cant { background: var(--danger); color: white; }
-        .btn-cant:hover { background: #f87171; }
+        .btn-cant { background: #dc2626; color: white; }
+        .btn-cant:hover { background: #ef4444; }
+        .btn-cant svg { flex-shrink: 0; }
 
         .btn-sponsor { background: var(--info); color: white; grid-column: span 2; }
         .btn-sponsor:hover { background: #60a5fa; }
@@ -359,7 +360,13 @@
             background: rgba(16, 185, 129, 0.12);
             border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 20px;
-            padding: 2px 7px;
+            padding: 3px 10px;
+            min-width: 38px;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
             white-space: nowrap;
         }
 
@@ -400,7 +407,7 @@
     <linearGradient id="cupGrad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
     </linearGradient>
-    <symbol id="icon-cup" viewBox="120 100 290 360">
+    <symbol id="icon-cup" viewBox="120 100 325 360">
       <g fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path d="M214 172c-18-20 18-36 0-58M282 172c-18-20 18-36 0-58" stroke="currentColor" stroke-width="20" opacity=".55"/>
         <path d="M348 258h20a44 44 0 0 1 0 88h-28" stroke="#10b981" stroke-width="26"/>
@@ -408,7 +415,7 @@
       </g>
       <path d="M148 218h200v82a100 100 0 0 1-200 0z" fill="url(#cupGrad)"/>
     </symbol>
-    <symbol id="icon-cup-sm" viewBox="130 200 260 260">
+    <symbol id="icon-cup-sm" viewBox="138 206 298 252">
       <g fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path d="M348 258h20a44 44 0 0 1 0 88h-28" stroke="currentColor" stroke-width="30"/>
         <path d="M170 438h156" stroke="currentColor" stroke-width="26"/>
@@ -441,7 +448,7 @@
         <strong id="currentPersonName">-</strong>
         <div class="action-buttons">
             <button class="btn btn-confirm" onclick="confirmMyCoffee()">✅ Potrjujem rundo</button>
-            <button class="btn btn-cant" onclick="cantGiveCoffee()">❌ Danes ne morem</button>
+            <button class="btn btn-cant" onclick="cantGiveCoffee()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg> Danes ne morem</button>
             <button class="btn btn-sponsor" onclick="sponsorCoffee()">⭐ Jaz častim danes (izven vrstnega reda)</button>
             <button class="btn btn-invite" onclick="inviteToCoffee()">⏰ Povabi na kavo (Teams)</button>
             <button class="btn btn-undo" onclick="undoLastAction()">↩️ Razveljavi (Undo)</button>
