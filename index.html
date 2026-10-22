@@ -239,7 +239,7 @@ function toast(msg,type='ok'){
   document.getElementById('toast').innerHTML=`<div class="${c} text-white text-sm p-4 rounded-2xl shadow-2xl font-medium">${esc(msg)}</div>`;
   clearTimeout(toast.t);toast.t=setTimeout(()=>document.getElementById('toast').innerHTML='',4000);
 }
-let ansRes=null;
+let ansRes=null,askVals={};
 function ask(title,text,ok='Potrdi',inner=''){
   return new Promise(res=>{
     ansRes=res;
@@ -248,6 +248,18 @@ function ask(title,text,ok='Potrdi',inner=''){
       <div class="flex gap-3 mt-5"><button onclick="A.ans(false)" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-semibold">Prekliči</button>
       <button onclick="A.ans(true)" class="flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold shadow hover:bg-blue-500">${esc(ok)}</button></div></div></div>`;
   });
+}
+function parseTime(v){
+  v=String(v||'').trim().replace(/[.,;\s]+/g,':');
+  let h,m;
+  let x=v.match(/^(\d{1,2}):(\d{1,2})$/);
+  if(x){h=+x[1];m=+x[2]}
+  else if(x=v.match(/^(\d{1,2})$/)){h=+x[1];m=0}
+  else if(x=v.match(/^(\d)(\d{2})$/)){h=+x[1];m=+x[2]}
+  else if(x=v.match(/^(\d{2})(\d{2})$/)){h=+x[1];m=+x[2]}
+  else return null;
+  if(h>23||m>59)return null;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
 }
 async function teams(msg){
   if(!CFG.teamsEnabled||!CFG.webhook||!CFG.webhook.trim())return null;
@@ -263,13 +275,15 @@ async function triggerTeams(actionType,extraData={}){
   const msgs=(CFG.teamsMsgs||[]).filter(m=>m.trigger===actionType&&m.text&&m.text.trim());
   const data={ime:who(),cas:CFG.inviteTime,datum:today(),...extraData};
   for(const m of msgs){
-    await teams(fill(m.text,data));
+    let out=fill(m.text,data);
+    if(actionType==='invite'&&data.besedilo)out+='\n\n'+data.besedilo;
+    await teams(out);
   }
 }
 
 // ===== DEJANJA =====
 const A=window.A={
-  ans(v){document.getElementById('modal').innerHTML='';ansRes&&ansRes(v);ansRes=null},
+  ans(v){askVals={};document.querySelectorAll('#modal [data-k]').forEach(e=>{askVals[e.dataset.k]=e.value});document.getElementById('modal').innerHTML='';ansRes&&ansRes(v);ansRes=null},
   tab(t){tab=t;render();scrollTo({top:0})},
   toggleAdmin(){
     tab = (tab === 'admin' ? 'main' : 'admin');
@@ -315,17 +329,22 @@ const A=window.A={
   async invite(){
     if(!me||!S.team.includes(me))return A.pick();
     const g=gate();if(g)return toast(g,'err');
-    const inner=`<input id="invTime" type="time" value="${esc(CFG.inviteTime)}" class="inp mt-4 text-center">`;
-    if(!await ask('Povabi na kavo (Teams)','Ob kateri uri gremo na kavo?','Pošlji vabilo',inner))return;
-    const time=(document.getElementById('invTime')||{}).value||CFG.inviteTime;
+    const inner=`<input data-k="time" id="invTime" type="text" inputmode="numeric" autocomplete="off" value="${esc(CFG.inviteTime)}" placeholder="Ura, npr. 1215" onfocus="this.select()" class="inp mt-4 text-center">
+      <input data-k="text" id="invText" type="text" maxlength="200" autocomplete="off" placeholder="Besedilo (neobvezno), npr. Takoj!" class="inp mt-2 text-center">`;
+    for(;;){
+      if(!await ask('Povabi na kavo (Teams)','Vpiši uro (npr. 1215 ali 12:15) in po želji besedilo.','Pošlji vabilo',inner))return;
+      const t=parseTime(askVals.time);
+      if(!t){toast('Neveljavna ura. Vpiši npr. 1215 ali 12:15.','err');continue}
+      var time=t,txt=(askVals.text||'').trim();break;
+    }
     const will=!S.todayPayer&&nextName(S);
     let w=null;
     if(!will){
-      triggerTeams('invite',{ime:who(),cas:time});
+      triggerTeams('invite',{ime:who(),cas:time,besedilo:txt});
       return toast(`Vabilo za ob ${time} poslano na Teams.`,'ok');
     }
     run(s=>{w=nextName(s);if(!w)throw new Error('none');pay(s,w,'invite',who())},'Vabilo poslano in runda potrjena.',()=>{
-      triggerTeams('invite',{ime:who(),cas:time});
+      triggerTeams('invite',{ime:who(),cas:time,besedilo:txt});
       triggerTeams('confirm',{ime:w,cas:time});
     });
   },
