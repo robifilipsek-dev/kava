@@ -30,22 +30,31 @@ body { font-family: Inter, system-ui, sans-serif; transition: background-color 0
 @media(max-width:480px){ .mg { grid-template-columns: repeat(2, 1fr) !important; } }
 .inp { width: 100%; padding: .55rem .75rem; border: 1px solid #cbd5e1; border-radius: .6rem; font-size: .875rem; background: #fff; transition: all 0.2s; }
 .dark .inp { background: #0f172a; border-color: #334155; color: #f8fafc; }
-.b { padding: .65rem 1.1rem; border-radius: .75rem; font-weight: 600; font-size: .825rem; color: #fff; transition: all 0.18s ease-in-out; box-shadow: 0 2px 4px rgba(0,0,0,0.08); display: inline-flex; items-center; justify-content: center; gap: .4rem; }
+.b { padding: .65rem 1.1rem; border-radius: .75rem; font-weight: 600; font-size: .825rem; color: #fff; transition: all 0.18s ease-in-out; box-shadow: 0 2px 4px rgba(0,0,0,0.08); display: inline-flex; align-items: center; text-align: center; justify-content: center; gap: .4rem; }
 .b:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); filter: brightness(1.06); }
 .b:active { transform: translateY(0); filter: brightness(0.95); }
 
-/* Gladek in zvezno utripajoč pulse efekt ob potrditvi runde */
+/* Utripajoč zeleni obroč za "Časti danes" */
 @keyframes pulse-green {
-  0%, 100% {
-    border-color: rgba(16, 185, 129, 1);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
-  }
-  50% {
-    border-color: rgba(52, 211, 153, 0.85);
-    box-shadow: 0 0 14px 3px rgba(16, 185, 129, 0.25);
-  }
+  0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.6),  0 0 20px 3px rgba(16,185,129,.35); }
+  70%  { box-shadow: 0 0 0 12px rgba(16,185,129,0), 0 0 20px 3px rgba(16,185,129,.35); }
+  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0),   0 0 20px 3px rgba(16,185,129,.35); }
 }
-.pulse-green { animation: pulse-green 2.2s ease-in-out infinite; }
+.pulse-green { animation: pulse-green 1.8s ease-out infinite; }
+
+/* Dostopnost in občutek */
+button:focus-visible, .inp:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+.inp:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.2); outline: none; }
+header button { min-height: 40px; min-width: 40px; }
+@keyframes kfade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes kpop { from { opacity: 0; transform: translateY(8px) scale(.97) } to { opacity: 1; transform: none } }
+#modal > div { animation: kfade .15s ease-out; }
+#modal > div > div { animation: kpop .18s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .pulse-green { animation: none; box-shadow: 0 0 0 3px rgba(16,185,129,.4), 0 0 16px 2px rgba(16,185,129,.3); }
+  #modal > div, #modal > div > div { animation: none; }
+  .b { transition: none; }
+}
 </style>
 </head>
 <body class="min-h-screen text-slate-800 bg-slate-100 dark:bg-slate-950 dark:text-slate-100">
@@ -280,6 +289,12 @@ async function triggerTeams(actionType,extraData={}){
     await teams(out);
   }
 }
+
+document.addEventListener('keydown',e=>{
+  if(!ansRes)return;
+  if(e.key==='Escape'){A.ans(false)}
+  else if(e.key==='Enter'&&e.target.tagName!=='BUTTON'){e.preventDefault();A.ans(true)}
+});
 
 // ===== DEJANJA =====
 const A=window.A={
@@ -571,7 +586,7 @@ function hero(){
   const d=new Date().toLocaleDateString('sl-SI',{weekday:'long',day:'numeric',month:'long'});
   return `<section class="bg-gradient-to-r from-kd via-kg to-ka text-white py-6 px-4 shadow-inner"><div class="max-w-4xl mx-auto">
     <h1 class="text-2xl sm:text-3xl font-extrabold">Kdo časti kavo?</h1>
-    <p class="text-slate-300 text-sm mt-1">Odmor za kavo • <span class="capitalize">${esc(d)}</span></p>
+    <p class="text-slate-300 text-sm mt-1"><span class="sm:hidden">Odmor za kavo • </span><span class="capitalize">${esc(d)}</span></p>
   </div></section>`;
 }
 
@@ -593,7 +608,7 @@ function viewMain(){
       cls = 'border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/40';
       st = '❌ Danes ne more';
     } else if(isPayer){
-      cls = 'border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-500 pulse-green';
+      cls = 'border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/60 dark:border-emerald-400 pulse-green';
       st = '⭐ Časti danes';
     } else if(isNext){
       cls = 'border-amber-400 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-500/80 ring-2 ring-amber-400/60';
@@ -603,11 +618,17 @@ function viewMain(){
       st = '✅ Že dal';
     }
     
-    return `<div class="rounded-xl border p-3 transition-all ${cls}"><div class="flex items-center justify-between gap-1">
-      <strong class="text-sm truncate ${name===me?'underline':''} ${isPayer ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : ''}">${esc(name)}</strong>
-      <span class="text-[11px] font-bold ${isPayer ? 'text-emerald-800 bg-emerald-100 border-emerald-300 dark:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-700' : 'text-blue-800 bg-blue-100 border-blue-300 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800'} border rounded-full px-2 py-0.5 whitespace-nowrap">☕ ${S.counts[name]||0}</span></div>
-      <div class="flex justify-end mt-1.5"><button onclick="A.toggleUnav(${i})" class="text-[11px] px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">${S.unav[name]?'❌ Odsoten':'✔️ Prisoten'}</button></div>
-      <div class="text-[11px] ${isPayer ? 'text-emerald-600 dark:text-emerald-400 font-bold' : isNext ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-500 dark:text-slate-400'} mt-1">${st}</div></div>`;
+    const stCls = isPayer ? 'text-emerald-600 dark:text-emerald-400 font-bold' : isNext ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-500 dark:text-slate-400';
+    const badgeCls = isPayer ? 'text-emerald-800 bg-emerald-100 border-emerald-300 dark:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-700' : 'text-blue-800 bg-blue-100 border-blue-300 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800';
+    return `<div class="rounded-xl border p-3 transition-all flex flex-col gap-2.5 ${cls}">
+      <div class="flex items-center justify-between gap-2">
+        <span class="flex items-center gap-1.5 min-w-0"><strong class="text-sm truncate ${isPayer ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : ''}">${esc(name)}</strong>${name===me?'<span class="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 shrink-0">ti</span>':''}</span>
+        <span class="text-xs font-bold ${badgeCls} border rounded-full px-2 py-0.5 whitespace-nowrap shrink-0">☕ ${S.counts[name]||0}</span>
+      </div>
+      <div class="mt-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div class="text-xs leading-tight ${stCls}">${st}</div>
+        <button onclick="A.toggleUnav(${i})" class="w-full sm:w-auto shrink-0 whitespace-nowrap text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">${S.unav[name]?'❌ Odsoten':'✔️ Prisoten'}</button>
+      </div></div>`;
   }).join('');
 
   const displayTitle = isConfirmed ? '⭐ Danes potrjeno časti:' : '👉 Na vrsti da časti:';
