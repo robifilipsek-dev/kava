@@ -50,7 +50,12 @@ header button { min-height: 40px; min-width: 40px; display: inline-flex; align-i
 @keyframes kpop { from { opacity: 0; transform: translateY(8px) scale(.97) } to { opacity: 1; transform: none } }
 #modal > div { animation: kfade .15s ease-out; }
 #modal > div > div { animation: kpop .18s ease-out; }
+#help > div { animation: kfade .15s ease-out; }
+#help > div > div { animation: kpop .18s ease-out; }
+summary { list-style: none; }
+summary::-webkit-details-marker { display: none; }
 @media (prefers-reduced-motion: reduce) {
+  #help > div, #help > div > div { animation: none; }
   .pulse-green { animation: none; box-shadow: 0 0 0 3px rgba(16,185,129,.4), 0 0 16px 2px rgba(16,185,129,.3); }
   #modal > div, #modal > div > div { animation: none; }
   .b { transition: none; }
@@ -60,6 +65,7 @@ header button { min-height: 40px; min-width: 40px; display: inline-flex; align-i
 <body class="min-h-screen text-slate-800 bg-slate-100 dark:bg-slate-950 dark:text-slate-100">
 <div id="app"></div>
 <div id="modal"></div>
+<div id="help"></div>
 <div id="toast" class="fixed bottom-5 left-4 right-4 sm:left-auto sm:right-5 sm:max-w-sm z-[60]"></div>
 
 <script type="module">
@@ -294,6 +300,10 @@ document.addEventListener('keydown',e=>{
   if(!ansRes)return;
   if(e.key==='Escape'){A.ans(false)}
   else if(e.key==='Enter'&&e.target.tagName!=='BUTTON'){e.preventDefault();A.ans(true)}
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('help')?.innerHTML)A.closeHelp();
 });
 
 // ===== DEJANJA =====
@@ -535,6 +545,14 @@ const A=window.A={
     if(installEv){installEv.prompt();await installEv.userChoice;installEv=null;render()}
     else toast(isIOS?"Tapni 'Deli' v Safariju in izberi 'Dodaj na začetni zaslon'.":"V meniju brskalnika izberi 'Namesti aplikacijo'.",'info');
   },
+  help(){
+    document.getElementById('help').innerHTML=helpView();
+    document.body.style.overflow='hidden';
+  },
+  closeHelp(){
+    document.getElementById('help').innerHTML='';
+    document.body.style.overflow='';
+  },
   contact(){location.href='mailto:'+['robi.filipsek','gmail.com'].join('@')+'?subject='+encodeURIComponent('Odmor za kavo')}
 };
 
@@ -548,6 +566,7 @@ function loginView(){
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-5">Kliknite spodaj za vstop v aplikacijo.</p>
     <div class="flex flex-col gap-3">
       <button onclick="A.guest()" class="b bg-blue-600 hover:bg-blue-500 font-bold text-sm py-3 shadow-lg">🚀 Vstopi v aplikacijo</button>
+      <button onclick="A.help()" class="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline py-1">❓ Kako deluje aplikacija? Navodila</button>
     </div></div></div>`;
 }
 
@@ -570,6 +589,9 @@ function header(){
     </div>
     <div class="flex items-center gap-1.5 sm:gap-2 text-xs">
       ${showInst?`<button onclick="A.install()" class="p-2 rounded-xl bg-kg border border-ka/50 flex items-center justify-center" title="Namesti aplikacijo">📲 <span class="hidden sm:inline ml-1">Namesti</span></button>`:''}
+      <button onclick="A.help()" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-kg border border-ka/50 hover:bg-slate-800 transition flex items-center justify-center gap-1.5 text-white" title="Navodila za uporabo">
+        ❓ <span class="hidden sm:inline font-semibold">Navodila</span>
+      </button>
       <button onclick="A.toggleTheme()" class="p-2 rounded-xl bg-slate-800 border border-slate-700 text-white transition hover:bg-slate-700 flex items-center justify-center" title="Preklopi temno/svetlo temo">
         ${isDark ? '☀️' : '🌙'}
       </button>
@@ -625,7 +647,7 @@ function viewMain(){
     const badgeCls = isPayer ? 'text-emerald-800 bg-emerald-100 border-emerald-300 dark:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-700' : 'text-blue-800 bg-blue-100 border-blue-300 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800';
     return `<div class="rounded-xl border p-3 transition-all flex flex-col gap-2.5 ${cls}">
       <div class="flex items-center justify-between gap-2">
-        <span class="flex items-center gap-1.5 min-w-0"><strong class="text-sm truncate ${isPayer ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : ''}">${esc(name)}</strong>${name===me?'<span class="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 shrink-0">ti</span>':''}</span>
+        <span class="flex items-center gap-1.5 min-w-0"><strong class="text-sm truncate ${isPayer ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : ''}">${esc(name)}</strong>${name===me?'<span class="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 shrink-0">jaz</span>':''}</span>
         <span class="text-xs font-bold ${badgeCls} border rounded-full px-2 py-0.5 whitespace-nowrap shrink-0">☕ ${S.counts[name]||0}</span>
       </div>
       <div class="mt-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -652,6 +674,119 @@ function viewMain(){
   <div class="text-xs text-slate-500 dark:text-slate-400 mt-4 flex items-center justify-between">
     <span>Izbrana oseba s seznama: <strong class="text-slate-800 dark:text-slate-200">${esc(me&&S.team.includes(me)?me:'Niste izbrali osebe')}</strong></span>
     <span>${loaded?'✅ Sinhronizirano':'⏳ Nalagam …'}</span></div>`;
+}
+
+function helpView(){
+  const sec=(ico,title,body,open)=>`<details ${open?'open':''} class="group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+    <summary class="cursor-pointer select-none flex items-center gap-2 px-3 py-2.5 font-semibold text-sm"><span>${ico}</span><span class="flex-1">${title}</span><span class="text-slate-400 transition group-open:rotate-180">▾</span></summary>
+    <div class="px-3 pb-3 text-[13px] leading-relaxed text-slate-600 dark:text-slate-300 space-y-2">${body}</div></details>`;
+  const btn=(cls,label,desc)=>`<div class="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-3 py-2 border-t first:border-t-0 border-slate-200 dark:border-slate-700">
+    <span class="shrink-0 sm:w-48"><span class="inline-block text-white text-xs font-semibold px-2.5 py-1 rounded-lg ${cls}">${label}</span></span><span class="min-w-0">${desc}</span></div>`;
+  const b=t=>`<strong class="text-slate-800 dark:text-slate-100">${t}</strong>`;
+
+  const admin=isAdmin()?sec('⚙️','Za skrbnika',`
+    <p>Z gumbom ${b('⚙️ Skrbnik')} v glavi odprete nastavitve:</p>
+    <ul class="list-disc pl-5 space-y-1">
+      <li>${b('Splošno:')} vklop/izklop aplikacije, obvestilo na vrhu strani, privzeta ura vabila, število stolpcev.</li>
+      <li>${b('Teams obvestila:')} vklop pošiljanja, URL Power Automate webhooka ter besedila sporočil. V besedilih lahko uporabite <code>{ime}</code>, <code>{cas}</code> in <code>{datum}</code>. Za vsako sporočilo izberete, ob katerem gumbu se pošlje. Z gumbom ${b('Pošlji test na Teams')} preverite, ali povezava deluje. Ne pozabite klikniti ${b('💾 Shrani nastavitve')}.</li>
+      <li>${b('Ekipa:')} preimenovanje, brisanje, vrstni red, ročno popravljanje števila rund, status »Že dal« in »Dopust«. Člani na dopustu so pri izbiri preskočeni.</li>
+      <li>${b('Uporabniki:')} pregled, kdo je trenutno aktiven v aplikaciji.</li>
+    </ul>`):'';
+
+  return `<div class="fixed inset-0 z-[55] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/70 backdrop-blur-sm" onclick="if(event.target===this)A.closeHelp()">
+  <div class="bg-white dark:bg-slate-900 dark:text-slate-100 rounded-t-2xl sm:rounded-2xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
+    <div class="flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 border-b border-slate-200 dark:border-slate-800">
+      <h3 class="font-bold text-lg">❓ Navodila za uporabo</h3>
+      <button onclick="A.closeHelp()" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-bold hover:bg-slate-200 dark:hover:bg-slate-700" title="Zapri" aria-label="Zapri">✕</button>
+    </div>
+    <div class="overflow-y-auto px-4 sm:px-5 py-4 space-y-3">
+
+      ${sec('☕','Kaj aplikacija počne',`
+        <p>Aplikacija pošteno razporeja, kdo je na vrsti, da <strong>častí kavo</strong>. Vsi v ekipi vidijo isto stanje v živo, zato vam ni treba ničesar usklajevati ročno.</p>
+        <p>Na vrsti je vedno oseba z ${b('najmanj plačanimi rundami')} (številka ☕ ob imenu). Če jih ima več enako, odloča vrstni red na seznamu. Ko so na vrsti prišli vsi, ki so danes prisotni, se krog začne znova.</p>`,true)}
+
+      ${sec('🚀','Prvi koraki',`
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>Kliknite ${b('🚀 Vstopi v aplikacijo')}.</li>
+          <li>Na vprašanje »Kdo si na seznamu?« izberite ${b('svoje ime')} in potrdite. Izbira se zapomni na tej napravi.</li>
+          <li>Če ste izbrali napačno osebo ali uporabljate aplikacijo za koga drugega, kliknite svoje ime v glavi strani in ga zamenjajte.</li>
+        </ol>
+        <p>${b('Prijava z Google računom:')} poleg vstopa kot gost je mogoča tudi prijava z Google računom. V oknu »Kdo si na seznamu?« kliknite povezavo ${b('🔑 Prijavi se z Google računom')}, ki je na dnu okna, in izberite svoj račun. Za običajno uporabo ni potrebna, skrbnik pa jo potrebuje za dostop do nastavitev.</p>
+        <p>Pri svojem imenu na seznamu vidite oznako ${b('JAZ')}.</p>`)}
+
+      ${sec('🔘','Kdaj pritisniti kateri gumb',`
+        <div>
+        ${btn('bg-emerald-600','✅ Potrjujem rundo',`${b('Si na vrsti ti?')} Če imaš na kartici oranžen okvir in piše »👉 Na vrsti za kavo«, pritisni ta gumb in s tem potrdi, da boš ${b('danes ti častil rundo')}. Ostali pritisnite gumb šele, ko oseba na vrsti to res potrdi. Števec te osebe se poveča, ob imenu se pojavi »Časti danes«, v Teams pa gre obvestilo (če je vklopljeno).`)}
+        ${btn('bg-red-600','✕ Danes ne more',`Pritisnite, ko ${b('oseba na vrsti danes ne more')} plačati (npr. je ni, nima časa). Označena je kot »Danes ne more« in na vrsti je naslednji. Naslednji dan se ta oznaka sama ponastavi.`)}
+        ${btn('bg-amber-500','⭐ Jaz častim',`Pritisnite, ko ${b('vi sami')} prostovoljno častite kavo, čeprav niste na vrsti. Plačana runda se vam všteje, vrstni red pa ostane pošten. Če ste bili slučajno prav vi na vrsti, se vrsta pomakne naprej.`)}
+        ${btn('bg-indigo-600','⏰ Povabi na kavo (Teams)',`Pritisnite, ko je čas za kavo. Vpišete uro (npr. <code>1215</code> ali <code>12:15</code>) in po želji kratko besedilo. Vabilo se pošlje v Teams kanal. ${b('Pozor:')} če danes še nihče ni potrjen, se s tem gumbom hkrati potrdi tudi runda za osebo, ki je na vrsti.`)}
+        ${btn('bg-slate-600','↩️ Razveljavi (Undo)',`Vrne zadnje dejanje, ki ste ga naredili vi (do 20 korakov). Ne deluje, če je medtem kdo drug spremenil stanje. Že poslanih Teams sporočil ne more preklicati.`)}
+        </div>
+        <p>Pred vsakim dejanjem se prikaže potrditveno okno. Z gumbom ${b('Prekliči')} ali tipko <kbd>Esc</kbd> ga zaprete brez sprememb.</p>`)}
+
+      ${sec('🧑‍🤝‍🧑','Kartice ekipe in statusi',`
+        <p>Vsaka kartica prikazuje ime, število plačanih rund (☕) in status:</p>
+        <ul class="space-y-1">
+          <li>👉 ${b('Na vrsti za kavo')}: oranžen okvir, naslednji plačnik.</li>
+          <li>⭐ ${b('Časti danes')}: zelen utripajoč okvir, danes potrjeni plačnik.</li>
+          <li>✅ ${b('Že dal')}: v tem krogu je že plačal.</li>
+          <li>⏳ ${b('Čaka na vrsto')}: še ni bil na vrsti.</li>
+          <li>❌ ${b('Danes ne more')}: danes je preskočen.</li>
+          <li>🌴 ${b('Dopust / odsoten')}: skrbnik ga je označil kot odsotnega.</li>
+        </ul>
+        <p>Gumb ${b('✔️ Prisoten / ❌ Odsoten')} na kartici lahko kliknete za vsakogar: če nekdo danes ni v službi, ga označite kot odsotnega in bo preskočen. Oznaka se naslednji dan sama ponastavi.</p>`)}
+
+      ${sec('🔔','Obvestila v Teams: kako jih nastaviti, da ne zamudite sporočila',`
+        <p>Aplikacija objavi sporočilo v skupni Teams kanal. Da vas Teams opozori nanj (pasica na zaslonu, zvok, značka), si nastavite obvestila za ta kanal:</p>
+        <p class="font-semibold text-slate-800 dark:text-slate-100">💻 Računalnik (Teams za namizje ali brskalnik)</p>
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>V Teams odprite zavihek ${b('Ekipe')} (Teams) in poiščite kanal, kamor aplikacija pošilja sporočila.</li>
+          <li>Z miško se postavite na ime kanala in kliknite ${b('⋯ (Več možnosti)')}.</li>
+          <li>Izberite ${b('Obvestila kanala')} (Channel notifications).</li>
+          <li>Izberite ${b('Vse dejavnosti')} (All activity). Če želite več nadzora, izberite ${b('Po meri')} (Custom) in pri ${b('Vse nove objave')} (All new posts) nastavite ${b('Pasica in vir')} (Banner and feed).</li>
+          <li>Shranite z ${b('Shrani')} (Save).</li>
+        </ol>
+        <p class="font-semibold text-slate-800 dark:text-slate-100 pt-1">📱 Telefon (aplikacija Teams)</p>
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>Odprite ${b('Ekipe')} (Teams) in poiščite kanal.</li>
+          <li>Pritisnite ${b('⋯')} ob imenu kanala in izberite ${b('Obvestila kanala')}.</li>
+          <li>Izberite ${b('Vse dejavnosti')} (ali Po meri → Vse nove objave).</li>
+          <li>V telefonu preverite še, da so obvestila za Teams dovoljena (Nastavitve telefona → Obvestila → Teams).</li>
+        </ol>
+        <p class="font-semibold text-slate-800 dark:text-slate-100 pt-1">💡 Dodatni nasveti</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>${b('Pripnite ali nastavite kanal med priljubljene')} (⋯ → Pripni / Fix), da ga imate vedno na vidnem.</li>
+          <li>Preverite splošne nastavitve: ${b('Nastavitve Teams → Obvestila in dejavnost')} (Notifications and activity) → ${b('Kanali')}.</li>
+          <li>Če imate v Teams stanje »Ne moti« ali v Windows vklopljeno »Pomoč pri osredotočanju«, obvestil ne boste videli.</li>
+          <li>Imena menijev se lahko malo razlikujejo glede na različico Teams in jezik.</li>
+        </ul>`)}
+
+      ${sec('📲','Namestitev na telefon ali računalnik',`
+        <p>Aplikacijo lahko namestite kot ikono, da se odpre z enim dotikom:</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>${b('Android / Chrome / Edge:')} kliknite gumb ${b('📲 Namesti')} v glavi (ali v meniju brskalnika izberite »Namesti aplikacijo«).</li>
+          <li>${b('iPhone / iPad:')} v Safariju tapnite ${b('Deli')} in izberite ${b('Dodaj na začetni zaslon')}.</li>
+        </ul>`)}
+
+      ${sec('🎨','Druge uporabne stvari',`
+        <ul class="list-disc pl-5 space-y-1">
+          <li>${b('☀️ / 🌙')}: preklop med svetlo in temno temo.</li>
+          <li>${b('Odjava')}: zapusti aplikacijo na tej napravi.</li>
+          <li>${b('✅ Sinhronizirano')} (spodaj): stanje je sveže in deli se z vsemi v ekipi.</li>
+          <li>Če se prikaže modra pasica na vrhu strani, je to sporočilo skrbnika.</li>
+        </ul>`)}
+
+      ${admin}
+
+      <div class="text-center pt-1 pb-1">
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Še vedno kaj ni jasno ali opazite napako?</p>
+        <button onclick="A.contact()" class="b bg-blue-600 hover:bg-blue-500 text-xs">✉️ Pišite skrbniku</button>
+      </div>
+    </div>
+    <div class="px-4 sm:px-5 py-3 border-t border-slate-200 dark:border-slate-800">
+      <button onclick="A.closeHelp()" class="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold shadow hover:bg-blue-500">Razumem, zapri</button>
+    </div>
+  </div></div>`;
 }
 
 function viewAdmin(){
