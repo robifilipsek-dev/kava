@@ -703,7 +703,7 @@ function helpView(){
 
       ${sec('☕','Kaj aplikacija počne',`
         <p>Aplikacija pošteno razporeja, kdo je na vrsti, da <strong>častí kavo</strong>. Vsi v ekipi vidijo isto stanje v živo, zato vam ni treba ničesar usklajevati ročno.</p>
-        <p>Na vrsti je vedno oseba z ${b('najmanj plačanimi rundami')} (številka ☕ ob imenu). Če jih ima več enako, odloča vrstni red na seznamu. Ko so na vrsti prišli vsi, ki so danes prisotni, se krog začne znova.</p>`,true)}
+        <p>Na vrsti je vedno oseba z ${b('najmanj plačanimi rundami')} (številka ☕ ob imenu). Če jih ima več enako, odloča vrstni red na seznamu. Ko so na vrsto prišli vsi, ki so danes prisotni, se krog začne znova.</p>`,true)}
 
       ${sec('🚀','Prvi koraki',`
         <ol class="list-decimal pl-5 space-y-1">
@@ -716,7 +716,7 @@ function helpView(){
 
       ${sec('🔘','Kdaj pritisniti kateri gumb',`
         <div>
-        ${btn('bg-emerald-600','✅ Potrjujem rundo',`${b('Si na vrsti ti?')} Če imaš na kartici oranžen okvir in piše »👉 Na vrsti za kavo«, pritisni ta gumb in s tem potrdi, da boš ${b('danes ti častil rundo')}. Ostali pritisnite gumb šele, ko oseba na vrsti to res potrdi. Števec te osebe se poveča, ob imenu se pojavi »Časti danes«, v Teams pa gre obvestilo (če je vklopljeno).`)}
+        ${btn('bg-emerald-600','✅ Potrjujem rundo',`${b('Si na vrsti ti?')} Če imaš na kartici oranžen okvir in piše »👉 Na vrsti za kavo«, pritisni ta gumb in s tem potrdi, da boš ${b('danes ti častil rundo')}. Števec te osebe se poveča, ob imenu se pojavi »Časti danes«, v Teams pa gre obvestilo (če je vklopljeno).`)}
         ${btn('bg-red-600','✕ Danes ne more',`Pritisnite, ko ${b('oseba na vrsti danes ne more')} plačati (npr. je ni, nima časa). Označena je kot »Danes ne more« in na vrsti je naslednji. Naslednji dan se ta oznaka sama ponastavi.`)}
         ${btn('bg-amber-500','⭐ Jaz častim',`Pritisnite, ko ${b('vi sami')} prostovoljno častite kavo, čeprav niste na vrsti. Plačana runda se vam všteje, vrstni red pa ostane pošten. Če ste bili slučajno prav vi na vrsti, se vrsta pomakne naprej.`)}
         ${btn('bg-indigo-600','⏰ Povabi na kavo (Teams)',`Pritisnite, ko je čas za kavo. Vpišete uro (npr. <code>1215</code> ali <code>12:15</code>) in po želji kratko besedilo. Vabilo se pošlje v Teams kanal. ${b('Pozor:')} če danes še nihče ni potrjen, se s tem gumbom hkrati potrdi tudi runda za osebo, ki je na vrsti.`)}
