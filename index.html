@@ -180,15 +180,14 @@ function pay(s,who,type,by,inTurn=true){
 function clearTodayPayerState(s){
   if(!s.todayPayer) return;
   const payer = s.todayPayer;
-  if(s.counts[payer] > 0){
-    s.counts[payer]--;
-  }
   s.paid[payer] = false;
   s.todayPayer = null;
+  // Števec zmanjšamo samo, če je bila runda res zabeležena (pay); ročna izbira skrbnika števca ni povečala.
   if(s.log.length > 0){
     const last = s.log[s.log.length - 1];
     if(last.who === payer && last.d === today()){
       s.log.pop();
+      if(s.counts[payer] > 0) s.counts[payer]--;
     }
   }
   adv(s);
@@ -402,6 +401,7 @@ const A=window.A={
   
   pick(){
     const isMandatory = !me || !S.team.includes(me);
+    if(isMandatory && document.getElementById('pickSel'))return;
     const cancelBtn = isMandatory
       ? `<button onclick="A.logout()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-semibold">Odjava</button>`
       : `<button onclick="A.ans(false)" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-semibold">Prekliči</button>`;
@@ -737,28 +737,28 @@ function helpView(){
         <p>Gumb ${b('✔️ Prisoten / ❌ Odsoten')} na kartici lahko kliknete za vsakogar: če nekdo danes ni v službi, ga označite kot odsotnega in bo preskočen. Oznaka se naslednji dan sama ponastavi.</p>`)}
 
       ${sec('🔔','Obvestila v Teams: kako jih nastaviti, da ne zamudite sporočila',`
-        <p>Aplikacija objavi sporočilo v skupni Teams kanal. Da vas Teams opozori nanj (pasica na zaslonu, zvok, značka), si nastavite obvestila za ta kanal:</p>
+        <p>Aplikacija objavi sporočilo v skupni Teams kanal. Da vas Teams opozori nanj (pasica na zaslonu, zvok, značka), si nastavite obvestila za ta kanal. Nastavitev je osebna, zato jo mora narediti vsak zase:</p>
         <p class="font-semibold text-slate-800 dark:text-slate-100">💻 Računalnik (Teams za namizje ali brskalnik)</p>
         <ol class="list-decimal pl-5 space-y-1">
-          <li>V Teams odprite zavihek ${b('Ekipe')} (Teams) in poiščite kanal, kamor aplikacija pošilja sporočila.</li>
+          <li>V Teams odprite zavihek ${b('Ekipe')} in poiščite kanal, kamor aplikacija pošilja sporočila.</li>
           <li>Z miško se postavite na ime kanala in kliknite ${b('⋯ (Več možnosti)')}.</li>
-          <li>Izberite ${b('Obvestila kanala')} (Channel notifications).</li>
-          <li>Izberite ${b('Vse dejavnosti')} (All activity). Če želite več nadzora, izberite ${b('Po meri')} (Custom) in pri ${b('Vse nove objave')} (All new posts) nastavite ${b('Pasica in vir')} (Banner and feed).</li>
-          <li>Shranite z ${b('Shrani')} (Save).</li>
+          <li>Izberite ${b('Obvestila kanala')}.</li>
+          <li>Ob možnosti »Obvesti me za vse nove objave« izberite ${b('Pokaži v Dejavnosti in pasici')}. Po želji obkljukajte še ${b('Vključi odgovore v pogovoru')}.</li>
+          <li>Kliknite ${b('Shrani')}.</li>
         </ol>
         <p class="font-semibold text-slate-800 dark:text-slate-100 pt-1">📱 Telefon (aplikacija Teams)</p>
         <ol class="list-decimal pl-5 space-y-1">
-          <li>Odprite ${b('Ekipe')} (Teams) in poiščite kanal.</li>
+          <li>Odprite ${b('Ekipe')} in poiščite kanal.</li>
           <li>Pritisnite ${b('⋯')} ob imenu kanala in izberite ${b('Obvestila kanala')}.</li>
-          <li>Izberite ${b('Vse dejavnosti')} (ali Po meri → Vse nove objave).</li>
+          <li>Pri nastavitvi za vse nove objave izberite možnost, ki prikaže pasico (če jo aplikacija ponuja, ${b('Pokaži v Dejavnosti in pasici')}).</li>
           <li>V telefonu preverite še, da so obvestila za Teams dovoljena (Nastavitve telefona → Obvestila → Teams).</li>
         </ol>
         <p class="font-semibold text-slate-800 dark:text-slate-100 pt-1">💡 Dodatni nasveti</p>
         <ul class="list-disc pl-5 space-y-1">
-          <li>${b('Pripnite ali nastavite kanal med priljubljene')} (⋯ → Pripni / Fix), da ga imate vedno na vidnem.</li>
-          <li>Preverite splošne nastavitve: ${b('Nastavitve Teams → Obvestila in dejavnost')} (Notifications and activity) → ${b('Kanali')}.</li>
+          <li>Kanal si lahko pripnete (${b('⋯ → Pripni')}), da ga imate vedno na vidnem.</li>
+          <li>V istem oknu z nastavitvami kanala je povezava ${b('Pojdi na nastavitve')}, kjer lahko izberete, kje želite prejemati obvestila.</li>
           <li>Če imate v Teams stanje »Ne moti« ali v Windows vklopljeno »Pomoč pri osredotočanju«, obvestil ne boste videli.</li>
-          <li>Imena menijev se lahko malo razlikujejo glede na različico Teams in jezik.</li>
+          <li>Imena menijev se lahko nekoliko razlikujejo glede na različico Teams in jezik.</li>
         </ul>`)}
 
       ${sec('📲','Namestitev na telefon ali računalnik',`
