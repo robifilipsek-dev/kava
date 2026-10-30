@@ -131,7 +131,7 @@ const firebaseConfig={
 };
 const DEFAULT_TEAM=["Filipšek","Fidler","Pirnat","Oprešnik","Govedić","Fendre","Šetina","Vrtačnik","Gračner","Rihter"];
 const DEF={
-  active:true,notice:'',cols:'auto',inviteTime:'12:00',teamsEnabled:true,
+  active:true,notice:'',cols:'auto',inviteTime:'12:00',inviteTimes:['11:45','11:50','11:55','12:00','12:05','12:10','12:15'],teamsEnabled:true,
   webhook:"https://default3caae3ec12124a678d46afe2847c45.a8.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/806a9b79b01b4219bc66ed4d449ffbfd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hTxW5wgDGp3I9TXnX6fSdLQ2r7sBnumVkzROnPYLIig",
   teamsMsgs:[
     {id:'1',name:'Vabilo na kavo',trigger:'invite',text:'☕ **{ime}** vas vabi na kavo! Zberemo se ob **{cas}**!'},
@@ -322,6 +322,13 @@ function parseTime(v){
   if(h>23||m>59)return null;
   return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
 }
+function inviteTimes(){
+  const values=Array.isArray(CFG.inviteTimes)?CFG.inviteTimes:DEF.inviteTimes;
+  return [...new Set(values.map(parseTime).filter(Boolean))];
+}
+function timePresetButtons(times){
+  return times.map(t=>`<button type="button" data-time="${t}" onclick="A.removeInviteTime(this)" class="chip chip-t" aria-label="Odstrani ${t}" title="Odstrani ${t}">${t} ×</button>`).join('');
+}
 async function teams(msg){
   if(!CFG.teamsEnabled||!CFG.webhook||!CFG.webhook.trim())return null;
   try{
@@ -424,7 +431,7 @@ const A=window.A={
     const now=new Date();
     const currentTime=`${p(now.getHours())}:${p(now.getMinutes())}`;
     const inner=`<input data-k="time" id="invTime" type="text" maxlength="200" autocomplete="off" value="${currentTime}" aria-label="Ura ali besedilo" placeholder="Ura ali besedilo" onfocus="this.select()" class="inp mt-4 text-center">
-      <div class="chips mt-2 justify-center">${['11:45','11:50','11:55','12:00','12:05','12:10','12:15'].map(t=>`<button type="button" onclick="A.setv('invTime','${t}')" class="chip">${t}</button>`).join('')}</div>`;
+      <div class="chips mt-2 justify-center">${inviteTimes().map(t=>`<button type="button" onclick="A.setv('invTime','${t}')" class="chip">${t}</button>`).join('')}</div>`;
     let time;
     for(;;){
       if(!await ask('Povabi na kavo (Teams)','Uro lahko spremeniš ali namesto nje vpišeš besedilo.','Pošlji vabilo',inner))return;
@@ -526,6 +533,21 @@ const A=window.A={
       render();
     }
   },
+  addInviteTime(){
+    const input=document.getElementById('newInviteTime');
+    const time=parseTime(input.value);
+    if(!time)return toast('Vpiši veljavno uro, npr. 12:15.','err');
+    const times=[...document.querySelectorAll('#inviteTimePresets [data-time]')].map(e=>e.dataset.time);
+    if(times.includes(time))return toast('Ta ura je že med predlogi.','info');
+    times.push(time);times.sort();
+    CFG.inviteTimes=times;
+    document.getElementById('inviteTimePresets').innerHTML=timePresetButtons(times);
+    input.value='';input.focus();
+  },
+  removeInviteTime(button){
+    button.remove();
+    CFG.inviteTimes=[...document.querySelectorAll('#inviteTimePresets [data-time]')].map(e=>e.dataset.time);
+  },
   async saveCfg(){
     const g=id=>document.getElementById(id);
     const msgs=(CFG.teamsMsgs||[]).map((m,i)=>{
@@ -542,7 +564,8 @@ const A=window.A={
       active:g('s_active').checked,
       notice:g('s_notice').value.trim(),
       cols:g('s_cols').value,
-      inviteTime:g('s_time').value||'12:00',
+      inviteTime:CFG.inviteTime||'12:00',
+      inviteTimes:inviteTimes(),
       teamsEnabled:g('t_enabled').checked,
       webhook:g('t_url').value.trim(),
       teamsMsgs:msgs
@@ -776,7 +799,7 @@ function helpView(){
   const admin=isAdmin()?sec('⚙️','Za skrbnika',`
     <p>Z gumbom ${b('⚙️ Skrbnik')} v glavi odprete nastavitve:</p>
     <ul class="list-disc pl-5 space-y-1">
-      <li>${b('Splošno:')} vklop/izklop aplikacije, obvestilo na vrhu strani, privzeta ura vabila, število stolpcev.</li>
+      <li>${b('Splošno:')} vklop/izklop aplikacije, obvestilo na vrhu strani, dodajanje in odstranjevanje predlogov ur za povabilo, število stolpcev.</li>
       <li>${b('Teams obvestila:')} vklop pošiljanja, URL Power Automate webhooka ter besedila sporočil. Ikone ter ime, uro in datum vstavite z dotikom na gumbe, besedilo pa se ob izbiri gumba samo predizpolni. Za vsako sporočilo izberete, ob katerem gumbu se pošlje. Z gumbom ${b('Pošlji test na Teams')} preverite, ali povezava deluje. Ne pozabite klikniti ${b('💾 Shrani nastavitve')}.</li>
       <li>${b('Ekipa:')} preimenovanje, brisanje, vrstni red, ročno popravljanje števila rund, status »Že dal« in »Dopust«. Člani na dopustu so pri izbiri preskočeni.</li>
       <li>${b('Uporabniki:')} pregled, kdo je trenutno aktiven v aplikaciji.</li>
@@ -919,7 +942,11 @@ function viewAdmin(){
     ${ck('s_active',CFG.active,'Aplikacija je aktivna')}
     <div class="grid sm:grid-cols-2 gap-3">
       <label class="${lbl}">Obvestilo na vrhu strani<input id="s_notice" maxlength="160" value="${esc(CFG.notice)}" class="inp mt-1" placeholder="Npr. Danes kava ob 12:15"></label>
-      <label class="${lbl}">Privzeta ura vabila<input id="s_time" type="time" value="${esc(CFG.inviteTime)}" class="inp mt-1"></label>
+      <div class="${lbl}">Predlogi ur za povabilo
+        <div id="inviteTimePresets" class="chips mt-2">${timePresetButtons(inviteTimes())}</div>
+        <div class="flex gap-2 mt-2"><input id="newInviteTime" type="text" inputmode="numeric" autocomplete="off" aria-label="Nova ura za predlog" placeholder="Npr. 12:20" class="inp" onkeydown="if(event.key==='Enter'){event.preventDefault();A.addInviteTime()}"><button type="button" onclick="A.addInviteTime()" class="b bg-blue-600">Dodaj</button></div>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Klikni predlog, da ga odstraniš. Spremembe potrdi z gumbom Shrani nastavitve. Polje v povabilu je vedno predizpolnjeno s trenutnim časom.</p>
+      </div>
     </div>
     <div class="grid sm:grid-cols-2 gap-3">
       <label class="${lbl}">Število stolpcev ekipe<select id="s_cols" class="inp mt-1">${['auto','2','3'].map(v=>`<option value="${v}" ${CFG.cols===v?'selected':''}>${v==='auto'?'Samodejno':v}</option>`).join('')}</select></label>
