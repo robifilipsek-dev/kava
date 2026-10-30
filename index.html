@@ -421,24 +421,25 @@ const A=window.A={
   async invite(){
     if(!me||!S.team.includes(me))return A.pick();
     const g=gate();if(g)return toast(g,'err');
-    const inner=`<input data-k="time" id="invTime" type="text" inputmode="numeric" autocomplete="off" value="${esc(CFG.inviteTime)}" placeholder="Ura, npr. 1215" onfocus="this.select()" class="inp mt-4 text-center">
-      <div class="chips mt-2 justify-center">${['12:00','12:15','12:30','13:00'].map(t=>`<button type="button" onclick="A.setv('invTime','${t}')" class="chip">${t}</button>`).join('')}</div>
-      <input data-k="text" id="invText" type="text" maxlength="200" autocomplete="off" placeholder="Besedilo (neobvezno), npr. Takoj!" class="inp mt-2 text-center">
-      <div class="chips mt-2 justify-center">${EMO.slice(0,8).map(e=>`<button type="button" onclick="A.addv('invText','${e} ')" class="chip">${e}</button>`).join('')}</div>`;
+    const now=new Date();
+    const currentTime=`${p(now.getHours())}:${p(now.getMinutes())}`;
+    const inner=`<input data-k="time" id="invTime" type="text" maxlength="200" autocomplete="off" value="${currentTime}" aria-label="Ura ali besedilo" placeholder="Ura ali besedilo" onfocus="this.select()" class="inp mt-4 text-center">
+      <div class="chips mt-2 justify-center">${['11:45','11:50','11:55','12:00','12:05','12:10','12:15'].map(t=>`<button type="button" onclick="A.setv('invTime','${t}')" class="chip">${t}</button>`).join('')}</div>`;
+    let time;
     for(;;){
-      if(!await ask('Povabi na kavo (Teams)','Vpiši uro (npr. 1215 ali 12:15) in po želji besedilo.','Pošlji vabilo',inner))return;
-      const t=parseTime(askVals.time);
-      if(!t){toast('Neveljavna ura. Vpiši npr. 1215 ali 12:15.','err');continue}
-      var time=t,txt=(askVals.text||'').trim();break;
+      if(!await ask('Povabi na kavo (Teams)','Uro lahko spremeniš ali namesto nje vpišeš besedilo.','Pošlji vabilo',inner))return;
+      const value=(askVals.time||'').trim();
+      if(!value){toast('Vpiši uro ali besedilo.','err');continue}
+      time=parseTime(value)||value;break;
     }
     const will=!S.todayPayer&&nextName(S);
     let w=null;
     if(!will){
-      triggerTeams('invite',{ime:who(),cas:time,besedilo:txt});
-      return toast(`Vabilo za ob ${time} poslano na Teams.`,'ok');
+      triggerTeams('invite',{ime:who(),cas:time});
+      return toast(`Vabilo (${time}) poslano na Teams.`,'ok');
     }
     run(s=>{w=nextName(s);if(!w)throw new Error('none');pay(s,w,'invite',who())},'Vabilo poslano in runda potrjena.',()=>{
-      triggerTeams('invite',{ime:who(),cas:time,besedilo:txt});
+      triggerTeams('invite',{ime:who(),cas:time});
       triggerTeams('confirm',{ime:w,cas:time});
     });
   },
@@ -807,7 +808,7 @@ function helpView(){
         ${btn('bg-emerald-600','✅ Potrjujem rundo',`${b('Si na vrsti ti?')} Če imaš na kartici oranžen okvir in piše »👉 Na vrsti za kavo«, pritisni ta gumb in s tem potrdi, da boš ${b('danes ti častil rundo')}. Števec te osebe se poveča, ob imenu se pojavi »Časti danes«, v Teams pa gre obvestilo (če je vklopljeno).`)}
         ${btn('bg-red-600','✕ Danes ne more',`Pritisnite, ko ${b('oseba na vrsti danes ne more')} plačati (npr. je ni, nima časa). Označena je kot »Danes ne more« in na vrsti je naslednji. Naslednji dan se ta oznaka sama ponastavi.`)}
         ${btn('bg-amber-500','⭐ Jaz častim',`Pritisnite, ko ${b('vi sami')} prostovoljno častite kavo, čeprav niste na vrsti. Plačana runda se vam všteje, vrstni red pa ostane pošten. Če ste bili slučajno prav vi na vrsti, se vrsta pomakne naprej.`)}
-        ${btn('bg-indigo-600','⏰ Povabi na kavo (Teams)',`Pritisnite, ko je čas za kavo. Vpišete uro (npr. <code>1215</code> ali <code>12:15</code>) in po želji kratko besedilo. Vabilo se pošlje v Teams kanal. ${b('Pozor:')} če danes še nihče ni potrjen, se s tem gumbom hkrati potrdi tudi runda za osebo, ki je na vrsti.`)}
+        ${btn('bg-indigo-600','⏰ Povabi na kavo (Teams)',`Pritisnite, ko je čas za kavo. Polje je predizpolnjeno s trenutnim časom ob kliku. Uro lahko spremenite, izberete s hitrim gumbom ali v isto polje namesto ure vpišete besedilo. Vabilo se pošlje v Teams kanal. ${b('Pozor:')} če danes še nihče ni potrjen, se s tem gumbom hkrati potrdi tudi runda za osebo, ki je na vrsti.`)}
         ${btn('bg-slate-600','↩️ Razveljavi (Undo)',`Vrne zadnje dejanje, ki ste ga naredili vi (do 20 korakov). Ne deluje, če je medtem kdo drug spremenil stanje. Že poslanih Teams sporočil ne more preklicati.`)}
         </div>
         <p>Pred vsakim dejanjem se prikaže potrditveno okno. Z gumbom ${b('Prekliči')} ali tipko <kbd>Esc</kbd> ga zaprete brez sprememb.</p>`)}
