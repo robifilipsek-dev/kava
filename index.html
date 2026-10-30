@@ -2,12 +2,13 @@
 <html lang="sl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Odmor za kavo</title>
 <meta name="theme-color" content="#0b132b">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Kava">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config={
@@ -60,6 +61,51 @@ summary::-webkit-details-marker { display: none; }
   #modal > div, #modal > div > div { animation: none; }
   .b { transition: none; }
 }
+
+/* ===== iOS VIDEZ ===== */
+:root{--ios-bg:#f2f2f7;--ios-card:#fff;--ios-sep:rgba(60,60,67,.18);--ios-fill:rgba(118,118,128,.12);--ios-l2:#8e8e93}
+html.dark{--ios-bg:#000;--ios-card:#1c1c1e;--ios-sep:rgba(84,84,88,.6);--ios-fill:rgba(118,118,128,.24)}
+html body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;background:var(--ios-bg)!important;-webkit-font-smoothing:antialiased}
+.ios-card{background:var(--ios-card);border-radius:20px}
+html.dark .dark\:bg-slate-900{background-color:#1c1c1e!important}
+html.dark .dark\:bg-slate-800,html.dark .dark\:bg-slate-800\/60,html.dark .dark\:bg-slate-800\/80{background-color:#2c2c2e!important}
+html.dark .dark\:border-slate-800,html.dark .dark\:border-slate-700{border-color:#38383a!important}
+.border-slate-200{border-color:#e5e5ea}
+.ios-nav{background:rgba(249,249,249,.78);color:#000;-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);border-bottom:.5px solid var(--ios-sep);padding-top:env(safe-area-inset-top)}
+html.dark .ios-nav{background:rgba(28,28,30,.78);color:#fff}
+html body .ios-nav button{background:var(--ios-fill)!important;border:0!important;color:inherit!important;border-radius:999px;font-weight:600}
+.ios-hero{max-width:56rem;margin:0 auto;padding:20px 16px 0}
+.ios-hero h1{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.ios-hero p{color:var(--ios-l2);margin-top:4px;font-size:.95rem}
+.ios-login{background:var(--ios-bg)}
+.mg>div{border-radius:18px}
+html body .b{border-radius:14px;padding:.8rem 1.1rem;font-size:.95rem;font-weight:600;box-shadow:none}
+html body .b:hover{transform:none;box-shadow:none;filter:none}
+html body .b:active{opacity:.6;filter:none}
+html body .b.bg-blue-600{background:#007aff}
+html body .b.bg-emerald-600{background:#34c759}
+html body .b.bg-red-600{background:#ff3b30}
+html body .b.bg-amber-500{background:#ff9500}
+html body .b.bg-indigo-600{background:#5856d6}
+html body .b.bg-rose-600{background:#ff2d55}
+html body .b.bg-slate-600,html body .b.bg-kg{background:var(--ios-fill)!important;color:#007aff}
+html body .inp{border:0;border-radius:11px;background:var(--ios-fill)!important;color:inherit!important;padding:.65rem .8rem;font-size:1rem}
+html body .inp:focus{box-shadow:0 0 0 2px rgba(0,122,255,.5)}
+#modal>div>div,#help>div>div{border:0!important;border-radius:22px;background:rgba(255,255,255,.92)!important;-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+html.dark #modal>div>div,html.dark #help>div>div{background:rgba(44,44,46,.94)!important}
+#help>div>div{border-radius:22px 22px 0 0}
+@media(min-width:640px){#help>div>div{border-radius:22px}}
+html body #toast>div{border-radius:16px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.ios-sw{appearance:none;-webkit-appearance:none;width:51px;height:31px;border-radius:999px;background:rgba(120,120,128,.32);position:relative;transition:background .2s;flex-shrink:0;cursor:pointer}
+.ios-sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .2s}
+.ios-sw:checked{background:#34c759}
+.ios-sw:checked::after{transform:translateX(20px)}
+.ios-group{background:var(--ios-fill);border-radius:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-width:40px;height:38px;padding:0 12px;border-radius:999px;background:var(--ios-fill);font-size:1.05rem;font-weight:600;color:inherit;transition:opacity .15s,transform .15s}
+.chip:active{opacity:.5;transform:scale(.94)}
+.chip-t{color:#007aff;font-size:.85rem}
+.bubble{background:#007aff;color:#fff;border-radius:18px 18px 18px 6px;padding:.55rem .85rem;font-size:.9rem;white-space:pre-wrap;width:fit-content;max-width:100%}
 </style>
 </head>
 <body class="min-h-screen text-slate-800 bg-slate-100 dark:bg-slate-950 dark:text-slate-100">
@@ -89,7 +135,8 @@ const DEF={
   webhook:"https://default3caae3ec12124a678d46afe2847c45.a8.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/806a9b79b01b4219bc66ed4d449ffbfd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hTxW5wgDGp3I9TXnX6fSdLQ2r7sBnumVkzROnPYLIig",
   teamsMsgs:[
     {id:'1',name:'Vabilo na kavo',trigger:'invite',text:'☕ **{ime}** vas vabi na kavo! Zberemo se ob **{cas}**!'},
-    {id:'2',name:'Potrditev runde',trigger:'confirm',text:'☕ Danes časti **{ime}**.'},
+    {id:'2',name:'Potrditev runde',trigger:'confirm',text:'✅ Danes časti **{ime}**.'},
+    {id:'4',name:'Danes ne more',trigger:'cant',text:'❌ **{ime}** danes ne more dati za kavo. Na vrsti je naslednji.'},
     {id:'3',name:'Prostovoljna častitka',trigger:'sponsor',text:'⭐ **{ime}** z veseljem časti kavo za vse!'}
   ]
 };
@@ -283,6 +330,27 @@ async function teams(msg){
   }catch(e){console.error('Teams:',e);return false}
 }
 const fill=(t,o)=>t.replace(/{ime}/g,o.ime||'').replace(/{cas}/g,o.cas||'').replace(/{datum}/g,o.datum||'');
+const PRESET={
+  invite:'⏰ **{ime}** vas vabi na kavo! Zberemo se ob **{cas}**!',
+  confirm:'✅ Danes časti **{ime}**.',
+  sponsor:'⭐ **{ime}** z veseljem časti kavo za vse!',
+  cant:'❌ **{ime}** danes ne more dati za kavo. Na vrsti je naslednji.',
+  none:''
+};
+const TRIG=[['invite','Povabi na kavo (Teams)'],['confirm','Potrjujem rundo'],['sponsor','Jaz častim'],['cant','Danes ne more'],['none','Brez gumba (samo ročno)']];
+const EMO=['✅','❌','⭐','☕','⏰','👉','🎉','🌴','🔔','👍','🙌','🍰'];
+const TOK=[['Ime','**{ime}**'],['Ura','**{cas}**'],['Datum','**{datum}**']];
+let noSync=false;
+function previewHtml(t){
+  const o={ime:me&&S.team.includes(me)?me:'Janez',cas:CFG.inviteTime||'12:00',datum:new Date().toLocaleDateString('sl-SI')};
+  return esc(fill(t||'',o)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')||'<span style="opacity:.7">Prazno besedilo</span>';
+}
+function syncMsgs(){
+  (CFG.teamsMsgs||[]).forEach((m,i)=>{
+    const g=id=>document.getElementById(id),a=g('t_name_'+i),b=g('t_trig_'+i),c=g('t_text_'+i);
+    if(a)m.name=a.value;if(b)m.trigger=b.value;if(c)m.text=c.value;
+  });
+}
 
 async function triggerTeams(actionType,extraData={}){
   if(!CFG.teamsEnabled||!CFG.webhook||!CFG.webhook.trim())return;
@@ -354,7 +422,9 @@ const A=window.A={
     if(!me||!S.team.includes(me))return A.pick();
     const g=gate();if(g)return toast(g,'err');
     const inner=`<input data-k="time" id="invTime" type="text" inputmode="numeric" autocomplete="off" value="${esc(CFG.inviteTime)}" placeholder="Ura, npr. 1215" onfocus="this.select()" class="inp mt-4 text-center">
-      <input data-k="text" id="invText" type="text" maxlength="200" autocomplete="off" placeholder="Besedilo (neobvezno), npr. Takoj!" class="inp mt-2 text-center">`;
+      <div class="chips mt-2 justify-center">${['12:00','12:15','12:30','13:00'].map(t=>`<button type="button" onclick="A.setv('invTime','${t}')" class="chip">${t}</button>`).join('')}</div>
+      <input data-k="text" id="invText" type="text" maxlength="200" autocomplete="off" placeholder="Besedilo (neobvezno), npr. Takoj!" class="inp mt-2 text-center">
+      <div class="chips mt-2 justify-center">${EMO.slice(0,8).map(e=>`<button type="button" onclick="A.addv('invText','${e} ')" class="chip">${e}</button>`).join('')}</div>`;
     for(;;){
       if(!await ask('Povabi na kavo (Teams)','Vpiši uro (npr. 1215 ali 12:15) in po želji besedilo.','Pošlji vabilo',inner))return;
       const t=parseTime(askVals.time);
@@ -441,7 +511,7 @@ const A=window.A={
         if(nameEl)m.name=nameEl.value;if(trigEl)m.trigger=trigEl.value;if(textEl)m.text=textEl.value;
       });
     }else{CFG.teamsMsgs=[];}
-    CFG.teamsMsgs.push({id:String(Date.now()),name:'Novo obvestilo',trigger:'invite',text:'☕ **{ime}** vas vabi na kavo!'});
+    CFG.teamsMsgs.push({id:String(Date.now()),name:'Novo obvestilo',trigger:'invite',text:PRESET.invite});
     render();
   },
   delTeamMsg(i){
@@ -451,7 +521,7 @@ const A=window.A={
         const nameEl=g(`t_name_${idx}`),trigEl=g(`t_trig_${idx}`),textEl=g(`t_text_${idx}`);
         if(nameEl)m.name=nameEl.value;if(trigEl)m.trigger=trigEl.value;if(textEl)m.text=textEl.value;
       });
-      CFG.teamsMsgs.splice(i,1);
+      CFG.teamsMsgs.splice(i,1);noSync=true;
       render();
     }
   },
@@ -487,6 +557,27 @@ const A=window.A={
     toast(r===null?'Webhook ni nastavljen ali pa so obvestila izklopljena.':r?'Testno sporočilo poslano.':'Pošiljanje ni uspelo.',r?'ok':'err');
   },
   
+  ins(i,str){
+    const ta=document.getElementById('t_text_'+i);if(!ta)return;
+    const s0=ta.selectionStart??ta.value.length,e0=ta.selectionEnd??s0;
+    ta.value=ta.value.slice(0,s0)+str+ta.value.slice(e0);
+    const pos=s0+str.length;ta.focus();ta.setSelectionRange(pos,pos);A.prevTxt(i);
+  },
+  prevTxt(i){const ta=document.getElementById('t_text_'+i),pv=document.getElementById('t_prev_'+i);if(ta&&pv)pv.innerHTML=previewHtml(ta.value)},
+  trigChange(i,sel){
+    const ta=document.getElementById('t_text_'+i);if(!ta)return;
+    const t=ta.value.trim();
+    if(!t||t===(PRESET[sel.dataset.prev]||'')){ta.value=PRESET[sel.value]||'';A.prevTxt(i)}
+    else toast('Tvoje besedilo je ohranjeno. Za predlog tapni »Predlagano besedilo«.','info');
+    sel.dataset.prev=sel.value;
+  },
+  resetText(i){
+    const sel=document.getElementById('t_trig_'+i),ta=document.getElementById('t_text_'+i);
+    if(sel&&ta){ta.value=PRESET[sel.value]||'';A.prevTxt(i)}
+  },
+  setv(id,v){const e=document.getElementById(id);if(e){e.value=v;e.focus()}},
+  addv(id,v){const e=document.getElementById(id);if(e){e.value=(e.value+v).slice(0,200);e.focus()}},
+
   // --- EKIPA ---
   count(i,d){run(s=>{const n=s.team[i];s.counts[n]=Math.max(0,s.counts[n]+d)})},
   setNext(i){run(s=>{s.idx=i},`${S.team[i]} je nastavljen kot naslednji.`)},
@@ -557,11 +648,11 @@ const A=window.A={
 };
 
 // ===== PRIKAZ =====
-const card='bg-white dark:bg-slate-900 dark:border-slate-800 rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5';
+const card='ios-card p-4 sm:p-5';
 const lbl='block text-xs font-semibold text-slate-600 dark:text-slate-400';
 
 function loginView(){
-  return `<div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-kd via-kg to-ka"><div class="${card} max-w-sm w-full text-center">
+  return `<div class="min-h-screen flex items-center justify-center p-4 ios-login"><div class="${card} max-w-sm w-full text-center">
     <img src="${ICON}" class="w-16 h-16 rounded-2xl mx-auto mb-3 shadow"><h1 class="font-bold text-xl text-slate-900 dark:text-white">Odmor za kavo</h1>
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-5">Kliknite spodaj za vstop v aplikacijo.</p>
     <div class="flex flex-col gap-3">
@@ -582,7 +673,7 @@ function header(){
 
   const userIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
 
-  return `<header class="bg-kd text-white sticky top-0 z-30 shadow-md"><div class="max-w-4xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
+  return `<header class="ios-nav sticky top-0 z-30"><div class="max-w-4xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
     <div class="flex items-center gap-2 cursor-pointer shrink-0" onclick="A.tab('main')">
       <img src="${ICON}" class="w-9 h-9 rounded-xl ring-2 ring-white/20">
       <span class="font-bold text-base sm:text-lg hidden sm:inline">Odmor za kavo</span>
@@ -609,10 +700,7 @@ function header(){
 
 function hero(){
   const d=new Date().toLocaleDateString('sl-SI',{weekday:'long',day:'numeric',month:'long'});
-  return `<section class="bg-gradient-to-r from-kd via-kg to-ka text-white py-6 px-4 shadow-inner"><div class="max-w-4xl mx-auto">
-    <h1 class="text-2xl sm:text-3xl font-extrabold">Kdo časti kavo?</h1>
-    <p class="text-slate-300 text-sm mt-1"><span class="sm:hidden">Odmor za kavo • </span><span class="capitalize">${esc(d)}</span></p>
-  </div></section>`;
+  return `<section class="ios-hero"><h1>Kdo časti kavo?</h1><p><span class="sm:hidden">Odmor za kavo • </span><span class="capitalize">${esc(d)}</span></p></section>`;
 }
 
 function viewMain(){
@@ -688,7 +776,7 @@ function helpView(){
     <p>Z gumbom ${b('⚙️ Skrbnik')} v glavi odprete nastavitve:</p>
     <ul class="list-disc pl-5 space-y-1">
       <li>${b('Splošno:')} vklop/izklop aplikacije, obvestilo na vrhu strani, privzeta ura vabila, število stolpcev.</li>
-      <li>${b('Teams obvestila:')} vklop pošiljanja, URL Power Automate webhooka ter besedila sporočil. V besedilih lahko uporabite <code>{ime}</code>, <code>{cas}</code> in <code>{datum}</code>. Za vsako sporočilo izberete, ob katerem gumbu se pošlje. Z gumbom ${b('Pošlji test na Teams')} preverite, ali povezava deluje. Ne pozabite klikniti ${b('💾 Shrani nastavitve')}.</li>
+      <li>${b('Teams obvestila:')} vklop pošiljanja, URL Power Automate webhooka ter besedila sporočil. Ikone ter ime, uro in datum vstavite z dotikom na gumbe, besedilo pa se ob izbiri gumba samo predizpolni. Za vsako sporočilo izberete, ob katerem gumbu se pošlje. Z gumbom ${b('Pošlji test na Teams')} preverite, ali povezava deluje. Ne pozabite klikniti ${b('💾 Shrani nastavitve')}.</li>
       <li>${b('Ekipa:')} preimenovanje, brisanje, vrstni red, ročno popravljanje števila rund, status »Že dal« in »Dopust«. Člani na dopustu so pri izbiri preskočeni.</li>
       <li>${b('Uporabniki:')} pregled, kdo je trenutno aktiven v aplikaciji.</li>
     </ul>`):'';
@@ -790,25 +878,20 @@ function helpView(){
 }
 
 function viewAdmin(){
-  const ck=(id,v,t)=>`<label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="${id}" ${v?'checked':''} class="w-4 h-4 accent-blue-600">${t}</label>`;
+  const ck=(id,v,t)=>`<label class="flex items-center justify-between gap-3 text-sm cursor-pointer"><span>${t}</span><input type="checkbox" id="${id}" ${v?'checked':''} class="ios-sw"></label>`;
   
   // Teams obvestila kartice
-  const msgs=(CFG.teamsMsgs||[]).map((m,i)=>`<div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 space-y-2 text-xs">
-    <div class="flex items-center justify-between gap-2">
-      <span class="font-bold text-slate-700 dark:text-slate-300">Obvestilo #${i+1}</span>
-      <button onclick="A.delTeamMsg(${i})" class="px-2 py-1 rounded bg-red-100 text-red-700 border border-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800 font-semibold">🗑️ Izbriši</button>
-    </div>
-    <div class="grid sm:grid-cols-2 gap-2">
-      <label class="${lbl}">Opis / Ime obvestila<input id="t_name_${i}" value="${esc(m.name)}" class="inp mt-1"></label>
-      <label class="${lbl}">Sproži ob kliku na gumb<select id="t_trig_${i}" class="inp mt-1">
-        <option value="invite" ${m.trigger==='invite'?'selected':''}>Gumb: Povabi na kavo (Teams)</option>
-        <option value="confirm" ${m.trigger==='confirm'?'selected':''}>Gumb: Potrjujem rundo</option>
-        <option value="sponsor" ${m.trigger==='sponsor'?'selected':''}>Gumb: Jaz častim</option>
-        <option value="cant" ${m.trigger==='cant'?'selected':''}>Gumb: Danes ne more</option>
-        <option value="none" ${m.trigger==='none'?'selected':''}>Brez gumba (samo ročno)</option>
-      </select></label>
-    </div>
-    <label class="${lbl}">Besedilo obvestila ({ime}, {cas}, {datum})<textarea id="t_text_${i}" rows="2" class="inp mt-1">${esc(m.text)}</textarea></label>
+  const msgs=(CFG.teamsMsgs||[]).map((m,i)=>`<div class="ios-group p-3 space-y-2.5 text-xs">
+    <div class="flex items-center justify-between gap-2"><span class="font-bold text-sm">Obvestilo ${i+1}</span>
+      <button onclick="A.delTeamMsg(${i})" class="text-red-500 font-semibold text-sm">Izbriši</button></div>
+    <label class="${lbl}">Ime obvestila<input id="t_name_${i}" value="${esc(m.name)}" class="inp mt-1"></label>
+    <label class="${lbl}">Pošlji, ko pritisneš gumb<select id="t_trig_${i}" data-prev="${esc(m.trigger)}" onchange="A.trigChange(${i},this)" class="inp mt-1">${TRIG.map(t=>`<option value="${t[0]}" ${m.trigger===t[0]?'selected':''}>${t[1]}</option>`).join('')}</select></label>
+    <div class="${lbl}">Dotakni se za vstavitev ikone ali podatka
+      <div class="chips mt-1.5">${EMO.map(e=>`<button type="button" class="chip" onclick="A.ins(${i},'${e} ')">${e}</button>`).join('')}</div>
+      <div class="chips mt-2">${TOK.map(t=>`<button type="button" class="chip chip-t" onclick="A.ins(${i},'${t[1]}')">${t[0]}</button>`).join('')}</div></div>
+    <label class="${lbl}">Besedilo<textarea id="t_text_${i}" rows="3" oninput="A.prevTxt(${i})" class="inp mt-1">${esc(m.text)}</textarea></label>
+    <div class="flex items-center justify-between gap-2"><span class="${lbl}">Predogled</span><button onclick="A.resetText(${i})" class="text-blue-500 font-semibold">Predlagano besedilo</button></div>
+    <div id="t_prev_${i}" class="bubble">${previewHtml(m.text)}</div>
   </div>`).join('');
 
   const team=S.team.map((n,i)=>`<div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 space-y-2 text-xs">
@@ -857,6 +940,7 @@ function viewAdmin(){
       ${ck('t_enabled',CFG.teamsEnabled,'Vklopi pošiljanje obvestil na Teams')}
     </div>
     <label class="${lbl}">Power Automate Webhook URL<input id="t_url" value="${esc(CFG.webhook)}" class="inp mt-1" placeholder="https://..."></label>
+    <p class="text-xs text-slate-500 dark:text-slate-400">Ob izbiri gumba se besedilo samo predizpolni. Ime, uro in datum aplikacija vstavi sama.</p>
     <div class="space-y-3">${msgs||'<div class="text-xs text-slate-500 p-2">Ni nastavljenih Teams obvestil. Kliknite "Dodaj obvestilo".</div>'}</div>
     <div class="flex gap-2 pt-2"><button onclick="A.saveCfg()" class="b bg-kg hover:bg-slate-800">💾 Shrani nastavitve</button><button onclick="A.testTeams()" class="b bg-indigo-600 hover:bg-indigo-500">Pošlji test na Teams</button></div>
   </div>
@@ -871,6 +955,7 @@ function viewAdmin(){
 function render(){
   const app=document.getElementById('app');
   if(!user){app.innerHTML=loginView();return}
+  if(tab==='admin'&&!noSync)syncMsgs();noSync=false;
   if(tab==='admin'&&document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)&&app.contains(document.activeElement))return;
   const body = tab==='admin' && isAdmin() ? viewAdmin() : viewMain();
   app.innerHTML=`${header()}${hero()}<main class="max-w-4xl mx-auto px-4 py-5">
