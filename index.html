@@ -4,21 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Odmor za kavo</title>
-<meta name="theme-color" content="#0b132b">
+<meta name="theme-color" content="#422c27">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Kava">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
+// One warm tonal scale for grouped surfaces, text, badges and controls.
+const roast={50:'#faf6f0',100:'#f2e9dd',200:'#e5d5c3',300:'#d4bba0',400:'#ba9674',500:'#886546',600:'#795538',700:'#63442f',800:'#4c352a',900:'#352820',950:'#261e1a'};
+const stone={50:'#faf8f5',100:'#f2efea',200:'#e4dfd8',300:'#cfc6bb',400:'#aca196',500:'#73695f',600:'#61584f',700:'#4a423c',800:'#342f2b',900:'#24211f',950:'#181615'};
 tailwind.config={
   darkMode:'class',
   theme:{
     extend:{
       colors:{
-        kd:'#0b132b',
-        kg:'#1c2541',
-        ka:'#2563eb',
+        kd:'#422c27',
+        kg:'#4c352a',
+        ka:'#795538',
+        slate:stone, blue:roast, amber:roast, emerald:roast, red:roast, rose:roast, indigo:roast,
         bean:'#8a5a34'
       }
     }
@@ -35,17 +39,9 @@ body { font-family: Inter, system-ui, sans-serif; transition: background-color 0
 .b:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); filter: brightness(1.06); }
 .b:active { transform: translateY(0); filter: brightness(0.95); }
 
-/* Utripajoč zeleni obroč za "Časti danes" */
-@keyframes pulse-green {
-  0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.6),  0 0 20px 3px rgba(16,185,129,.35); }
-  70%  { box-shadow: 0 0 0 12px rgba(16,185,129,0), 0 0 20px 3px rgba(16,185,129,.35); }
-  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0),   0 0 20px 3px rgba(16,185,129,.35); }
-}
-.pulse-green { animation: pulse-green 1.8s ease-out infinite; }
-
 /* Dostopnost in občutek */
-button:focus-visible, .inp:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
-.inp:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.2); outline: none; }
+button:focus-visible, .inp:focus-visible { outline: 2px solid #ac825b; outline-offset: 2px; }
+.inp:focus { border-color: #906b4a; box-shadow: 0 0 0 3px rgba(145,104,68,.22); outline: none; }
 header button { min-height: 40px; min-width: 40px; display: inline-flex; align-items: center; justify-content: center; }
 @keyframes kfade { from { opacity: 0 } to { opacity: 1 } }
 @keyframes kpop { from { opacity: 0; transform: translateY(8px) scale(.97) } to { opacity: 1; transform: none } }
@@ -57,19 +53,18 @@ summary { list-style: none; }
 summary::-webkit-details-marker { display: none; }
 @media (prefers-reduced-motion: reduce) {
   #help > div, #help > div > div { animation: none; }
-  .pulse-green { animation: none; box-shadow: 0 0 0 3px rgba(16,185,129,.4), 0 0 16px 2px rgba(16,185,129,.3); }
   #modal > div, #modal > div > div { animation: none; }
   .b { transition: none; }
 }
 
 /* ===== iOS VIDEZ ===== */
 :root{--ios-bg:#f2f2f7;--ios-card:#fff;--ios-sep:rgba(60,60,67,.18);--ios-fill:rgba(118,118,128,.12);--ios-l2:#8e8e93}
-html.dark{--ios-bg:#000;--ios-card:#1c1c1e;--ios-sep:rgba(84,84,88,.6);--ios-fill:rgba(118,118,128,.24)}
+html.dark{--ios-bg:#000;--ios-card:#242220;--ios-sep:rgba(84,84,88,.6);--ios-fill:rgba(118,118,128,.24)}
 html body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;background:var(--ios-bg)!important;-webkit-font-smoothing:antialiased}
 .ios-card{background:var(--ios-card);border-radius:20px}
-html.dark .dark\:bg-slate-900{background-color:#1c1c1e!important}
-html.dark .dark\:bg-slate-800,html.dark .dark\:bg-slate-800\/60,html.dark .dark\:bg-slate-800\/80{background-color:#2c2c2e!important}
-html.dark .dark\:border-slate-800,html.dark .dark\:border-slate-700{border-color:#38383a!important}
+html.dark .dark\:bg-slate-900{background-color:#242220!important}
+html.dark .dark\:bg-slate-800,html.dark .dark\:bg-slate-800\/60,html.dark .dark\:bg-slate-800\/80{background-color:#312c28!important}
+html.dark .dark\:border-slate-800,html.dark .dark\:border-slate-700{border-color:#453c35!important}
 .border-slate-200{border-color:#e5e5ea}
 .ios-nav{background:rgba(249,249,249,.78);color:#000;-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);border-bottom:.5px solid var(--ios-sep);padding-top:env(safe-area-inset-top)}
 html.dark .ios-nav{background:rgba(28,28,30,.78);color:#fff}
@@ -82,30 +77,97 @@ html body .ios-nav button{background:var(--ios-fill)!important;border:0!importan
 html body .b{border-radius:14px;padding:.8rem 1.1rem;font-size:.95rem;font-weight:600;box-shadow:none}
 html body .b:hover{transform:none;box-shadow:none;filter:none}
 html body .b:active{opacity:.6;filter:none}
-html body .b.bg-blue-600{background:#007aff}
-html body .b.bg-emerald-600{background:#34c759}
-html body .b.bg-red-600{background:#ff3b30}
-html body .b.bg-amber-500{background:#ff9500}
-html body .b.bg-indigo-600{background:#5856d6}
-html body .b.bg-rose-600{background:#ff2d55}
-html body .b.bg-slate-600,html body .b.bg-kg{background:var(--ios-fill)!important;color:#007aff}
+html body .b.bg-blue-600{background:var(--coffee)}
+html body .b.bg-emerald-600{background:#785339}
+html body .b.bg-red-600{background:#674437}
+html body .b.bg-amber-500{background:#805e40}
+html body .b.bg-indigo-600{background:#76563e}
+html body .b.bg-rose-600{background:#694635}
+html body .b.bg-slate-600,html body .b.bg-kg{background:var(--ios-fill)!important;color:var(--coffee)}
 html body .inp{border:0;border-radius:11px;background:var(--ios-fill)!important;color:inherit!important;padding:.65rem .8rem;font-size:1rem}
-html body .inp:focus{box-shadow:0 0 0 2px rgba(0,122,255,.5)}
-#modal>div>div,#help>div>div{border:0!important;border-radius:22px;background:rgba(255,255,255,.92)!important;-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
-html.dark #modal>div>div,html.dark #help>div>div{background:rgba(44,44,46,.94)!important}
+html body .inp:focus{box-shadow:0 0 0 2px rgba(145,104,68,.55)}
+#modal>div>div,#help>div>div{border:0!important;border-radius:22px;background:rgba(255,252,247,.96)!important;-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+html.dark #modal>div>div,html.dark #help>div>div{background:rgba(43,38,34,.96)!important}
 #help>div>div{border-radius:22px 22px 0 0}
 @media(min-width:640px){#help>div>div{border-radius:22px}}
 html body #toast>div{border-radius:16px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.2)}
 .ios-sw{appearance:none;-webkit-appearance:none;width:51px;height:31px;border-radius:999px;background:rgba(120,120,128,.32);position:relative;transition:background .2s;flex-shrink:0;cursor:pointer}
 .ios-sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .2s}
-.ios-sw:checked{background:#34c759}
+.ios-sw:checked{background:#785339}
 .ios-sw:checked::after{transform:translateX(20px)}
 .ios-group{background:var(--ios-fill);border-radius:16px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{min-width:40px;height:38px;padding:0 12px;border-radius:999px;background:var(--ios-fill);font-size:1.05rem;font-weight:600;color:inherit;transition:opacity .15s,transform .15s}
 .chip:active{opacity:.5;transform:scale(.94)}
-.chip-t{color:#007aff;font-size:.85rem}
-.bubble{background:#007aff;color:#fff;border-radius:18px 18px 18px 6px;padding:.55rem .85rem;font-size:.9rem;white-space:pre-wrap;width:fit-content;max-width:100%}
+.chip-t{color:var(--coffee);font-size:.85rem}
+.bubble{background:var(--coffee);color:#fff;border-radius:18px 18px 18px 6px;padding:.55rem .85rem;font-size:.9rem;white-space:pre-wrap;width:fit-content;max-width:100%}
+:root{--ios-bg:#f5f2ed;--ios-card:#fffdf9;--ios-fill:#ece7df;--line:#dfd9d1;--coffee:#774831;--muted:#665d55;--ink:#302823;--wash:#f2ebe2;--green:#765237}
+html.dark{--ios-bg:#171615;--ios-card:#242220;--ios-fill:#393531;--line:#423b36;--coffee:#efbc93;--muted:#b8afa7;--ink:#faf3e9;--wash:#38302a;--green:#d6b58d;color-scheme:dark}
+html body{color:var(--ink)}
+.ios-nav{background:color-mix(in srgb,var(--ios-bg) 88%,transparent);border-color:var(--line)}
+html.dark .ios-nav{background:rgba(29,27,25,.88)}
+.ios-nav>div{min-height:64px;height:auto;padding-block:8px;flex-wrap:wrap}
+.ios-nav>div>div:last-child{flex-wrap:wrap;justify-content:flex-end}
+.ios-nav button{min-width:44px;min-height:44px}
+.ios-hero{padding-top:18px}.hero-panel,.login-art{position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 88% 28%,#b0835d 0%,#79533f 42%,#49332c 76%,#3b2925 100%)}
+.hero-panel{display:flex;align-items:center;min-height:182px;border-radius:26px;color:#fff7e8}
+.hero-copy{padding:26px 5%;position:relative;z-index:1;max-width:68%}
+.kicker{display:block;font-size:10px;font-weight:700;letter-spacing:.19em;color:#f3cda4}
+.hero-copy h1,.login-copy h1{letter-spacing:-.055em;font-weight:700;line-height:1.06}
+.hero-copy h1{font-size:clamp(32px,4.4vw,52px);margin:9px 0}
+.ios-hero .hero-copy p{color:#edd8c5;font-size:14px}
+.hero-art{position:absolute;inset:0 0 0 auto;width:42%;pointer-events:none}.hero-art svg,.login-art svg{height:100%;width:100%;display:block}
+.ios-login{padding:24px 16px;background:radial-gradient(ellipse at 50% 38%,var(--wash),var(--ios-bg) 65%)}
+.ios-login .ios-card{overflow:hidden;padding:0 0 24px;max-width:400px}
+.login-art{height:178px;margin-bottom:25px}.login-art svg{transform:scale(1.08)}
+.login-copy{padding:0 26px}.login-copy .kicker{color:var(--coffee)}.login-copy h1{font-size:34px;margin:9px 0}.login-copy p{line-height:1.55;font-size:15px;color:var(--muted);margin-bottom:22px}
+.ios-login .flex-col{padding:0 24px}.ios-login .flex-col button:last-child{color:var(--coffee);min-height:44px}
+.ios-card{border:1px solid var(--line);border-radius:23px;box-shadow:0 6px 20px -14px #27190e55}
+html body .ios-login .b{background:#754933;color:white;gap:12px}
+.round-panel{text-align:left}.round-panel>.text-xs:first-child{font-size:13px;color:var(--muted);font-weight:600}
+.round-panel>.text-3xl{font-size:clamp(32px,5vw,47px);color:var(--coffee);letter-spacing:-.055em;line-height:1.1;overflow-wrap:anywhere}
+.round-panel .grid{border-top:1px solid var(--line);padding-top:14px}
+html body .round-panel .b{display:flex;align-items:center;justify-content:flex-start;gap:10px;background:var(--wash);color:var(--ink);min-height:44px}
+html body .round-panel .b.bg-emerald-600{background:#754933;color:#fff}
+html body .round-panel .b.bg-red-600{color:#76503b}html.dark body .round-panel .b.bg-red-600{color:#dfbfa2}
+html body .round-panel .b.bg-slate-600{justify-content:center;background:transparent!important;color:var(--muted);font-size:13px}
+.team-title{font-size:22px;font-weight:700;letter-spacing:-.04em;margin:22px 0 10px}
+.mg{grid-template-columns:repeat(var(--c),minmax(0,1fr))}.mg>div{min-width:0}.mg>div>.mt-auto{flex-wrap:wrap}
+.mg .pulse-green,.mg .ring-2{animation:none;box-shadow:none}
+.mg .pulse-green{border-color:var(--green)}
+#modal>div>div,#help>div>div{overflow-y:auto;max-height:90dvh}
+#app main{padding-bottom:max(28px,env(safe-area-inset-bottom))}
+@media(max-width:639px){.hero-panel{min-height:144px;border-radius:21px}.hero-copy{padding:18px;max-width:71%}.hero-copy h1{font-size:clamp(29px,7.9vw,42px)}.hero-art{width:35%;right:-2%}.hero-art svg{transform:scale(1.23)}.ios-hero{padding-top:12px}
+.ios-nav>div{flex-wrap:nowrap}.ios-nav>div>div:last-child{gap:3px}.ios-nav button{padding-inline:7px}.mg button{min-height:44px}.round-panel .grid{gap:7px}.round-panel .grid .b{padding:.65rem .9rem}.ios-login{min-height:100svh}
+}
+
+/* Member cards share the same surface; emphasis follows the order of play. */
+html body .mg>[data-team-state]{background:var(--ios-card);color:var(--ink);border:1px solid var(--line);box-shadow:none;opacity:1}
+html body .mg>[data-team-state=next]{background:var(--wash);border:1px solid #b79772}
+html body .mg>[data-team-state=payer]{background:var(--wash);border:2px solid var(--coffee)}
+html body .mg>[data-team-state=away],html body .mg>[data-team-state=unavailable]{background:var(--ios-bg)}
+html body .mg .rounded-full,html body .mg .rounded-md{background:var(--ios-fill);color:var(--coffee);border-color:var(--line)}
+html body .mg .leading-tight{color:var(--muted)}
+html body .mg [data-team-state=payer] .leading-tight,html body .mg [data-team-state=next] .leading-tight{color:var(--coffee);font-weight:700}
+html body .mg button{background:var(--ios-card);color:var(--ink);border-color:var(--line)}
+html body .mg button:hover{background:var(--wash)}
+html body .b.bg-blue-600,.bubble{background:#765139;color:#fff}
+html body .ios-sw:checked{background:#8a6749}
+html body input[type=checkbox]{accent-color:#886346}
+html body .inp::placeholder{color:var(--muted)}
+
+:root{--mint:#256149;--mint-bg:#e9f3e9;--mint-edge:#77a88a;--honey:#805018;--honey-bg:#fff2d8;--honey-edge:#cea15a;--plum:#614772;--plum-bg:#f0e8f3}
+html.dark{--mint:#b1deba;--mint-bg:#23382e;--mint-edge:#709e7d;--honey:#f0c78b;--honey-bg:#3c3123;--honey-edge:#b18a51;--plum:#dec3e8;--plum-bg:#39303e}
+html body .round-panel .b.bg-emerald-600,#help .bg-emerald-600{background:#326b50;color:white}
+html body .round-panel .b.bg-amber-500,#help .bg-amber-500{background:var(--honey-bg);color:var(--honey)}
+html body .round-panel .b.bg-indigo-600,#help .bg-indigo-600{background:var(--plum-bg);color:var(--plum)}
+html body .mg>[data-team-state=next]{background:var(--honey-bg);border-color:var(--honey-edge)}
+html body .mg>[data-team-state=payer]{background:var(--mint-bg);border-color:var(--mint-edge)}
+html body .mg [data-team-state=next] .leading-tight,.round-panel[data-round=next]>.text-3xl{color:var(--honey)}
+html body .mg [data-team-state=payer] .leading-tight,html body .mg [data-team-state=payer] strong,.round-panel[data-round=payer]>.text-3xl{color:var(--mint)}
+.round-panel[data-round]>.text-xs:first-child{display:inline-flex;align-items:center;gap:7px}
+.round-panel[data-round]>.text-xs:first-child::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--honey-edge)}
+.round-panel[data-round=payer]>.text-xs:first-child::before{background:var(--mint-edge)}
 </style>
 </head>
 <body class="min-h-screen text-slate-800 bg-slate-100 dark:bg-slate-950 dark:text-slate-100">
@@ -157,7 +219,13 @@ function applyTheme() {
 applyTheme();
 
 // ===== IKONA / PWA =====
-const CUP=`<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='#0b132b'/><g transform='translate(256 256) scale(.95) translate(-286 -276)'><g fill='none' stroke-linecap='round'><path d='M214 172c-18-20 18-36 0-58M282 172c-18-20 18-36 0-58' stroke='#fff' stroke-width='20' opacity='.6'/><path d='M348 258h20a44 44 0 0 1 0 88h-28' stroke='#3b82f6' stroke-width='26'/><path d='M170 438h156' stroke='#fff' stroke-width='20'/></g><path d='M148 218h200v82a100 100 0 0 1-200 0z' fill='#60a5fa'/></g></svg>`;
+const CUP=`<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 64 64'><defs><linearGradient id='coffee' x2='1' y2='1'><stop stop-color='#aa7854'/><stop offset='1' stop-color='#4d302b'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(#coffee)'/><g stroke='#fff1d7' stroke-linecap='round' stroke-linejoin='round'><path d='M17 27h26v7a13 13 0 0 1-26 0z' fill='#fff1d7' stroke-width='2'/><path d='M43 29h3a5 5 0 1 1 0 10h-4M17 50h28M25 20c-5-6 5-6 0-12m9 12c-5-6 5-6 0-12' fill='none' stroke-width='3'/></g></svg>`;
+const coffeeArt=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="saucer" x2=".8" y2="1"><stop stop-color="#fff7db"/><stop offset=".62" stop-color="#d2bea4"/><stop offset="1" stop-color="#a88e78"/></linearGradient>
+<radialGradient id="espresso"><stop stop-color="#ad663c"/><stop offset=".8" stop-color="#a36137"/><stop offset=".95" stop-color="#c58d50"/><stop offset="1" stop-color="#764627"/></radialGradient>
+<filter id="soft" x="-.4" y="-.4" width="1.8" height="1.8"><feGaussianBlur stdDeviation="7"/></filter></defs>
+<g transform="translate(219 119) rotate(-26)"><ellipse cx="0" cy="12" rx="105" ry="104" fill="#21170e" opacity=".4" filter="url(#soft)"/><circle r="104" fill="url(#saucer)"/><circle r="97" fill="none" stroke="#fff5db" opacity=".65"/><circle r="78" fill="#9a7b66"/><path d="M58 -10h29q23 0 23 13t-23 14H59" fill="none" stroke="#dbcbb5" stroke-width="14"/><circle r="73" fill="#fff4dc"/><circle r="65" fill="url(#espresso)"/>
+<g fill="#fff1ca"><path d="M0 43C-8 31-42 25-41 0c10 17 27 14 40 35C9 16 30 15 40-1c2 21-20 31-40 44Z"/><path d="M0 29C-6 18-32 14-32-7c8 12 25 11 32 29C8 7 24 6 31-9c3 19-18 26-31 38Z"/><path d="M0 15c-7-9-24-11-23-28C-14-3-7-6 0 8c7-13 16-13 23-23 0 17-15 22-23 30Z"/><path d="M0 3c-18-12-16-26-6-24 4 1 6 5 6 7 2-8 10-12 15-6 4 8-9 18-15 23Z"/></g><path d="M0-7q-4 28 4 52" stroke="#fff3d4" stroke-width="2.5" fill="none"/></g></svg>`;
 const ICON='data:image/svg+xml,'+encodeURIComponent(CUP);
 (function(){
   const l=document.createElement('link');l.rel='icon';l.href=ICON;document.head.appendChild(l);
@@ -165,7 +233,7 @@ const ICON='data:image/svg+xml,'+encodeURIComponent(CUP);
   img.onload=()=>{try{
     const png=s=>{const c=document.createElement('canvas');c.width=c.height=s;c.getContext('2d').drawImage(img,0,0,s,s);return c.toDataURL('image/png')};
     const a=document.createElement('link');a.rel='apple-touch-icon';a.href=png(180);document.head.appendChild(a);
-    const m={name:'Odmor za kavo',short_name:'Kava',start_url:location.href.split('#')[0],display:'standalone',background_color:'#0b132b',theme_color:'#0b132b',icons:[{src:png(512),sizes:'512x512',type:'image/png',purpose:'any'}]};
+    const m={name:'Odmor za kavo',short_name:'Kava',start_url:location.href.split('#')[0],display:'standalone',background_color:'#422c27',theme_color:'#422c27',icons:[{src:png(512),sizes:'512x512',type:'image/png',purpose:'any'}]};
     const mk=document.createElement('link');mk.rel='manifest';mk.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));document.head.appendChild(mk);
   }catch(e){}};
   img.src=ICON;
@@ -677,11 +745,10 @@ const lbl='block text-xs font-semibold text-slate-600 dark:text-slate-400';
 
 function loginView(){
   return `<div class="min-h-screen flex items-center justify-center p-4 ios-login"><div class="${card} max-w-sm w-full text-center">
-    <img src="${ICON}" class="w-16 h-16 rounded-2xl mx-auto mb-3 shadow"><h1 class="font-bold text-xl text-slate-900 dark:text-white">Odmor za kavo</h1>
-    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-5">Kliknite spodaj za vstop v aplikacijo.</p>
+    <div class="login-art">${coffeeArt}</div><div class="login-copy"><span class="kicker">KAVNI KROG</span><h1>Odmor za kavo</h1><p>Preveri, kdo je na vrsti za naslednjo rundo, ali povabi ekipo na kavo.</p></div>
     <div class="flex flex-col gap-3">
-      <button onclick="A.guest()" class="b bg-blue-600 hover:bg-blue-500 font-bold text-sm py-3 shadow-lg">🚀 Vstopi v aplikacijo</button>
-      <button onclick="A.help()" class="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline py-1">❓ Kako deluje aplikacija? Navodila</button>
+      <button onclick="A.guest()" class="b bg-blue-600 hover:bg-blue-500 font-bold text-sm py-3 shadow-lg">Vstopi v aplikacijo <span aria-hidden="true">→</span></button>
+      <button onclick="A.help()" class="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline py-1">Kako deluje aplikacija?</button>
     </div></div></div>`;
 }
 
@@ -695,7 +762,7 @@ function header(){
     </button>
   ` : '';
 
-  const userIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+  const userIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
 
   return `<header class="ios-nav sticky top-0 z-30"><div class="max-w-4xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
     <div class="flex items-center gap-2 cursor-pointer shrink-0" onclick="A.tab('main')">
@@ -703,9 +770,9 @@ function header(){
       <span class="font-bold text-base sm:text-lg hidden sm:inline">Odmor za kavo</span>
     </div>
     <div class="flex items-center gap-1.5 sm:gap-2 text-xs">
-      ${showInst?`<button onclick="A.install()" class="p-2 rounded-xl bg-kg border border-ka/50 flex items-center justify-center" title="Namesti aplikacijo">📲 <span class="hidden sm:inline ml-1">Namesti</span></button>`:''}
+      ${showInst?`<button onclick="A.install()" class="p-2 rounded-xl bg-kg border border-ka/50 flex items-center justify-center" title="Namesti aplikacijo"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-4-4 4 4 4-4M4 16v4h16v-4"/></svg> <span class="hidden sm:inline ml-1">Namesti</span></button>`:''}
       <button onclick="A.help()" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-kg border border-ka/50 hover:bg-slate-800 transition flex items-center justify-center gap-1.5 text-white" title="Navodila za uporabo">
-        ❓ <span class="hidden sm:inline font-semibold">Navodila</span>
+        <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 3-3 5m0 3v.1"/></svg> <span class="hidden sm:inline font-semibold">Navodila</span>
       </button>
       <button onclick="A.toggleTheme()" class="p-2 rounded-xl bg-slate-800 border border-slate-700 text-white transition hover:bg-slate-700 flex items-center justify-center" title="Preklopi temno/svetlo temo">
         ${isDark ? '☀️' : '🌙'}
@@ -724,7 +791,7 @@ function header(){
 
 function hero(){
   const d=new Date().toLocaleDateString('sl-SI',{weekday:'long',day:'numeric',month:'long'});
-  return `<section class="ios-hero"><h1>Kdo časti kavo?</h1><p><span class="sm:hidden">Odmor za kavo • </span><span class="capitalize">${esc(d)}</span></p></section>`;
+  return `<section class="ios-hero"><div class="hero-panel"><div class="hero-copy"><span class="kicker">ODMOR ZA KAVO</span><h1>${tab==='admin'?'Skrbniške nastavitve':'Kdo časti kavo?'}</h1><p class="capitalize">${esc(d)}</p></div><div class="hero-art">${coffeeArt}</div></div></section>`;
 }
 
 function viewMain(){
@@ -736,56 +803,56 @@ function viewMain(){
     const isPayer = S.todayPayer === name;
     const isNext = name === nextPerson;
     
-    let cls = 'border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800', st = '⏳ Čaka na vrsto';
+    let cls = 'border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800', st = 'Čaka na vrsto';
     
     if(S.absent[name]){
       cls = 'border-slate-200 bg-slate-100 opacity-60 dark:bg-slate-800/50 dark:border-slate-800';
-      st = '🌴 Dopust / odsoten';
+      st = 'Dopust / odsoten';
     } else if(S.unav[name]){
       cls = 'border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/40';
-      st = '❌ Danes ne more';
+      st = 'Danes ne more';
     } else if(isPayer){
       cls = 'border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/60 dark:border-emerald-400 pulse-green';
-      st = '⭐ Časti danes';
+      st = 'Časti danes';
     } else if(isNext){
       cls = 'border-amber-400 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-500/80 ring-2 ring-amber-400/60';
-      st = '👉 Na vrsti za kavo';
+      st = 'Na vrsti za kavo';
     } else if(S.paid[name]){
       cls = 'border-blue-200 bg-blue-50/50 dark:bg-slate-800/80 dark:border-slate-700';
-      st = '✅ Že dal';
+      st = 'Že dal';
     }
     
     const stCls = isPayer ? 'text-emerald-600 dark:text-emerald-400 font-bold' : isNext ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-500 dark:text-slate-400';
     const badgeCls = isPayer ? 'text-emerald-800 bg-emerald-100 border-emerald-300 dark:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-700' : 'text-blue-800 bg-blue-100 border-blue-300 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800';
-    return `<div class="rounded-xl border p-3 transition-all flex flex-col gap-2.5 ${cls}">
+    return `<div data-team-state="${S.absent[name]?'away':S.unav[name]?'unavailable':isPayer?'payer':isNext?'next':S.paid[name]?'paid':'waiting'}" class="rounded-xl border p-3 transition-all flex flex-col gap-2.5 ${cls}">
       <div class="flex items-center justify-between gap-2">
         <span class="flex items-center gap-1.5 min-w-0"><strong class="text-sm truncate ${isPayer ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : ''}">${esc(name)}</strong>${name===me?'<span class="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 shrink-0">jaz</span>':''}</span>
         <span class="text-xs font-bold ${badgeCls} border rounded-full px-2 py-0.5 whitespace-nowrap shrink-0">☕ ${S.counts[name]||0}</span>
       </div>
       <div class="mt-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div class="text-xs leading-tight ${stCls}">${st}</div>
-        <button onclick="A.toggleUnav(${i})" class="w-full sm:w-auto shrink-0 whitespace-nowrap text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">${S.unav[name]?'❌ Odsoten':'✔️ Prisoten'}</button>
+        <button onclick="A.toggleUnav(${i})" class="w-full sm:w-auto shrink-0 whitespace-nowrap text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">${S.unav[name]?'× Odsoten':'✓ Prisoten'}</button>
       </div></div>`;
   }).join('');
 
-  const displayTitle = isConfirmed ? '⭐ Danes potrjeno časti:' : '👉 Na vrsti da časti:';
+  const displayTitle = isConfirmed ? 'Danes časti' : 'Na vrsti za kavo';
   const displayName = isConfirmed ? S.todayPayer : (nextPerson || '-');
   const displayClass = isConfirmed ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400';
 
-  return `<div class="${card} text-center mb-4 transition-all">
+  return `<div data-round="${isConfirmed?'payer':'next'}" class="${card} round-panel text-center mb-4 transition-all">
     <div class="text-xs ${isConfirmed ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-500 dark:text-slate-400'}">${displayTitle}</div>
     <div class="text-3xl sm:text-4xl my-1.5 font-extrabold ${displayClass}">${esc(displayName)}</div>
     ${isConfirmed && nextPerson && nextPerson !== S.todayPayer ? `<div class="text-xs text-slate-500 dark:text-slate-400 mb-2">Naslednji na vrsti: <strong>${esc(nextPerson)}</strong></div>` : ''}
     <div class="grid sm:grid-cols-2 gap-2 mt-4">
-      <button onclick="A.confirm()" class="b bg-emerald-600 hover:bg-emerald-500">✅ Potrjujem rundo</button>
-      <button onclick="A.cant()" class="b bg-red-600 hover:bg-red-500">✕ Danes ne more</button>
-      <button onclick="A.sponsor()" class="b bg-amber-500 hover:bg-amber-400">⭐ Jaz častim (izven vrstnega reda)</button>
-      <button onclick="A.invite()" class="b bg-indigo-600 hover:bg-indigo-500">⏰ Povabi na kavo (Teams)</button>
-      <button onclick="A.undo()" class="b bg-slate-600 hover:bg-slate-500 dark:bg-slate-700 sm:col-span-2">↩️ Razveljavi (Undo)</button></div></div>
-  <div class="mg" style="--c:${cols}">${cards}</div>
+      <button onclick="A.confirm()" class="b bg-emerald-600 hover:bg-emerald-500"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> Potrjujem rundo</button>
+      <button onclick="A.cant()" class="b bg-red-600 hover:bg-red-500"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6m0-6-6 6"/></svg> Danes ne more</button>
+      <button onclick="A.sponsor()" class="b bg-amber-500 hover:bg-amber-400"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.3.9-4.5 4.4 1 6.2-5.6-3-5.6 3 1-6.2L3 9.6l6.2-.9z"/></svg> Častim mimo vrste</button>
+      <button onclick="A.invite()" class="b bg-indigo-600 hover:bg-indigo-500"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 18-7-6 18-4-7-8-4Zm8 4L21 3"/></svg> Povabi na kavo (Teams)</button>
+      <button onclick="A.undo()" class="b bg-slate-600 hover:bg-slate-500 dark:bg-slate-700 sm:col-span-2"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5-6 6 6 5m-5-5h11a5 5 0 0 1 0 10"/></svg> Razveljavi</button></div></div>
+  <h2 class="team-title">Ekipa</h2><div class="mg" style="--c:${cols}">${cards}</div>
   <div class="text-xs text-slate-500 dark:text-slate-400 mt-4 flex items-center justify-between">
     <span>Izbrana oseba s seznama: <strong class="text-slate-800 dark:text-slate-200">${esc(me&&S.team.includes(me)?me:'Niste izbrali osebe')}</strong></span>
-    <span>${loaded?'✅ Sinhronizirano':'⏳ Nalagam …'}</span></div>`;
+    <span>${loaded?'✓ Sinhronizirano':'Nalaganje …'}</span></div>`;
 }
 
 function helpView(){
@@ -828,7 +895,7 @@ function helpView(){
 
       ${sec('🔘','Kdaj pritisniti kateri gumb',`
         <div>
-        ${btn('bg-emerald-600','✅ Potrjujem rundo',`${b('Si na vrsti ti?')} Če imaš na kartici oranžen okvir in piše »👉 Na vrsti za kavo«, pritisni ta gumb in s tem potrdi, da boš ${b('danes ti častil rundo')}. Števec te osebe se poveča, ob imenu se pojavi »Časti danes«, v Teams pa gre obvestilo (če je vklopljeno).`)}
+        ${btn('bg-emerald-600','✅ Potrjujem rundo',`${b('Si na vrsti ti?')} Če imaš na kartici jantarni rob in piše »Na vrsti za kavo«, pritisni ta gumb in s tem potrdi, da boš ${b('danes ti častil rundo')}. Števec te osebe se poveča, ob imenu se pojavi »Časti danes«, v Teams pa gre obvestilo (če je vklopljeno).`)}
         ${btn('bg-red-600','✕ Danes ne more',`Pritisnite, ko ${b('oseba na vrsti danes ne more')} plačati (npr. je ni, nima časa). Označena je kot »Danes ne more« in na vrsti je naslednji. Naslednji dan se ta oznaka sama ponastavi.`)}
         ${btn('bg-amber-500','⭐ Jaz častim',`Pritisnite, ko ${b('vi sami')} prostovoljno častite kavo, čeprav niste na vrsti. Plačana runda se vam všteje, vrstni red pa ostane pošten. Če ste bili slučajno prav vi na vrsti, se vrsta pomakne naprej.`)}
         ${btn('bg-indigo-600','⏰ Povabi na kavo (Teams)',`Pritisnite, ko je čas za kavo. Polje je predizpolnjeno s trenutnim časom ob kliku. Uro lahko spremenite, izberete s hitrim gumbom ali v isto polje namesto ure vpišete besedilo. Vabilo se pošlje v Teams kanal. ${b('Pozor:')} če danes še nihče ni potrjen, se s tem gumbom hkrati potrdi tudi runda za osebo, ki je na vrsti.`)}
@@ -839,14 +906,14 @@ function helpView(){
       ${sec('🧑‍🤝‍🧑','Kartice ekipe in statusi',`
         <p>Vsaka kartica prikazuje ime, število plačanih rund (☕) in status:</p>
         <ul class="space-y-1">
-          <li>👉 ${b('Na vrsti za kavo')}: oranžen okvir, naslednji plačnik.</li>
-          <li>⭐ ${b('Časti danes')}: zelen utripajoč okvir, danes potrjeni plačnik.</li>
+          <li>👉 ${b('Na vrsti za kavo')}: jantarni rob, naslednji plačnik.</li>
+          <li>⭐ ${b('Časti danes')}: zelen rob, danes potrjeni plačnik.</li>
           <li>✅ ${b('Že dal')}: v tem krogu je že plačal.</li>
           <li>⏳ ${b('Čaka na vrsto')}: še ni bil na vrsti.</li>
           <li>❌ ${b('Danes ne more')}: danes je preskočen.</li>
           <li>🌴 ${b('Dopust / odsoten')}: skrbnik ga je označil kot odsotnega.</li>
         </ul>
-        <p>Gumb ${b('✔️ Prisoten / ❌ Odsoten')} na kartici lahko kliknete za vsakogar: če nekdo danes ni v službi, ga označite kot odsotnega in bo preskočen. Oznaka se naslednji dan sama ponastavi.</p>`)}
+        <p>Gumb ${b('✓ Prisoten / × Odsoten')} na kartici lahko kliknete za vsakogar: če nekdo danes ni v službi, ga označite kot odsotnega in bo preskočen. Oznaka se naslednji dan sama ponastavi.</p>`)}
 
       ${sec('🔔','Obvestila v Teams: kako jih nastaviti, da ne zamudite sporočila',`
         <p>Aplikacija objavi sporočilo v skupni Teams kanal. Da vas Teams opozori nanj (pasica na zaslonu, zvok, značka), si nastavite obvestila za ta kanal. Nastavitev je osebna, zato jo mora narediti vsak zase:</p>
@@ -884,8 +951,8 @@ function helpView(){
         <ul class="list-disc pl-5 space-y-1">
           <li>${b('☀️ / 🌙')}: preklop med svetlo in temno temo.</li>
           <li>${b('Odjava')}: zapusti aplikacijo na tej napravi.</li>
-          <li>${b('✅ Sinhronizirano')} (spodaj): stanje je sveže in deli se z vsemi v ekipi.</li>
-          <li>Če se prikaže modra pasica na vrhu strani, je to sporočilo skrbnika.</li>
+          <li>${b('✓ Sinhronizirano')} (spodaj): stanje je sveže in deli se z vsemi v ekipi.</li>
+          <li>Če se prikaže pasica z obvestilom na vrhu strani, je to sporočilo skrbnika.</li>
         </ul>`)}
 
       ${admin}
