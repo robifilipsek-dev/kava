@@ -193,7 +193,7 @@ const firebaseConfig={
 };
 const DEFAULT_TEAM=["Filipšek","Fidler","Pirnat","Oprešnik","Govedić","Fendre","Šetina","Vrtačnik","Gračner","Rihter"];
 const DEF={
-  active:true,notice:'',cols:'auto',inviteTime:'12:00',inviteTimes:['11:45','11:50','11:55','12:00','12:05','12:10','12:15'],teamsEnabled:true,
+  active:true,notice:'',cols:'auto',histDays:0,inviteTime:'12:00',inviteTimes:['11:45','11:50','11:55','12:00','12:05','12:10','12:15'],teamsEnabled:true,
   webhook:"https://default3caae3ec12124a678d46afe2847c45.a8.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/806a9b79b01b4219bc66ed4d449ffbfd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hTxW5wgDGp3I9TXnX6fSdLQ2r7sBnumVkzROnPYLIig",
   teamsMsgs:[
     {id:'1',name:'Vabilo na kavo',trigger:'invite',text:'☕ **{ime}** vas vabi na kavo! Zberemo se ob **{cas}**!'},
@@ -454,6 +454,30 @@ const A=window.A={
   tab(t){tab=t;render();scrollTo({top:0})},
   toggleHist(){tab=(tab==='history'?'main':'history');render();scrollTo({top:0})},
   histF(v){histFilter=v;document.activeElement?.blur();render()},
+  async editLog(i){
+    if(!isAdmin())return;
+    const l=S.log[i];if(!l)return;
+    const inner=`<div class="space-y-2 mt-3">
+      <input data-k="d" type="date" class="inp" max="${today()}" value="${esc(l.d)}">
+      <select data-k="w" class="inp">${[...new Set([...S.team,l.who])].map(n=>`<option value="${esc(n)}" ${n===l.who?'selected':''}>${esc(n)}</option>`).join('')}</select>
+      <select data-k="c" class="inp"><option value="1" selected>Če zamenjam osebo, popravi tudi števca</option><option value="0">Števcev ne spreminjaj</option></select></div>`;
+    if(!await ask('Uredi zapis','Spremeni datum ali osebo, ki je častila.','Shrani',inner))return;
+    const d=askVals.d,w=askVals.w,fix=askVals.c==='1';
+    if(!d||!w)return toast('Izberi datum in osebo.','info');
+    if(d>today())return toast('Datum ne sme biti v prihodnosti.','info');
+    run(s=>{const x=s.log[i];if(!x||x.d!==l.d||x.who!==l.who)return;
+      if(fix&&w!==x.who){if((s.counts[x.who]||0)>0)s.counts[x.who]--;if(w in s.counts)s.counts[w]++}
+      x.d=d;x.who=w},'Zapis popravljen.');
+  },
+  async cleanLog(){
+    if(!isAdmin())return;
+    const inner=`<div class="mt-3"><select data-k="n" class="inp"><option value="90">starejše od 90 dni</option><option value="180">starejše od 180 dni</option><option value="365" selected>starejše od 1 leta</option><option value="730">starejše od 2 let</option></select></div>`;
+    if(!await ask('Izbris starih zapisov','Zapisi zgodovine se trajno izbrišejo. Števci rund se ne spremenijo.','Izbriši',inner))return;
+    const n=+askVals.n||365,cut=iso(new Date(Date.now()-n*864e5));
+    const cnt=S.log.filter(l=>l&&l.d<cut).length;
+    if(!cnt)return toast('Ni starih zapisov za izbris.','info');
+    run(s=>{s.log=s.log.filter(l=>!(l&&l.d<cut))},`Izbrisanih zapisov: ${cnt}.`);
+  },
   async addLog(){
     if(!isAdmin())return;
     const d=document.getElementById('mDate')?.value,w=document.getElementById('mWho')?.value,inc=!!document.getElementById('mCount')?.checked;
@@ -466,8 +490,10 @@ const A=window.A={
   async delLog(i){
     if(!isAdmin())return;
     const l=S.log[i];if(!l)return;
-    if(!(await ask('Izbris zapisa',`Izbrišem zapis: ${l.who}, ${l.d}? Števec te osebe se zmanjša za 1.`,'Izbriši')))return;
-    run(s=>{const x=s.log[i];if(!x||x.d!==l.d||x.who!==l.who)return;s.log.splice(i,1);if((s.counts[l.who]||0)>0)s.counts[l.who]--;
+    const inner=`<div class="mt-3"><select data-k="c" class="inp"><option value="1" selected>Zmanjšaj števec rund za 1</option><option value="0">Števca ne spreminjaj</option></select></div>`;
+    if(!(await ask('Izbris zapisa',`Izbrišem zapis: ${l.who}, ${l.d}?`,'Izbriši',inner)))return;
+    const dec=askVals.c!=='0';
+    run(s=>{const x=s.log[i];if(!x||x.d!==l.d||x.who!==l.who)return;s.log.splice(i,1);if(dec&&(s.counts[l.who]||0)>0)s.counts[l.who]--;
       if(s.todayPayer===l.who&&l.d===today()&&!s.log.some(y=>y.d===today()&&y.who===l.who)){s.paid[l.who]=false;s.todayPayer=null}},'Zapis izbrisan.');
   },
   toggleAdmin(){
@@ -650,6 +676,7 @@ const A=window.A={
       active:g('s_active').checked,
       notice:g('s_notice').value.trim(),
       cols:g('s_cols').value,
+      histDays:+g('s_histDays').value||0,
       inviteTime:CFG.inviteTime||'12:00',
       inviteTimes:inviteTimes(),
       teamsEnabled:g('t_enabled').checked,
@@ -881,7 +908,11 @@ function viewMain(){
 
 let histFilter='';
 function viewHistory(){
-  const all=[...S.log].map((l,i)=>({...l,i})).filter(l=>l&&typeof l.d==='string'&&l.d.includes('-')).sort((a,b)=>(b.d+(b.t||'')).localeCompare(a.d+(a.t||'')));
+  const hd=+CFG.histDays||0;
+  const cutoff=hd?iso(new Date(Date.now()-hd*864e5)):'';
+  const all0=[...S.log].map((l,i)=>({...l,i})).filter(l=>l&&typeof l.d==='string'&&l.d.includes('-'));
+  const all1=(hd&&!isAdmin())?all0.filter(l=>l.d>=cutoff):all0;
+  const all=all1.sort((a,b)=>(b.d+(b.t||'')).localeCompare(a.d+(a.t||'')));
   const names=[...new Set([...S.team,...all.map(l=>l.who)])];
   if(histFilter&&!names.includes(histFilter))histFilter='';
   const list=histFilter?all.filter(l=>l.who===histFilter):all;
@@ -900,7 +931,7 @@ function viewHistory(){
     html+=`<div class="ios-group flex items-center justify-between gap-2 px-3 py-2.5 mb-1.5">
       <div class="min-w-0"><div class="text-xs capitalize" style="color:var(--muted)">${esc(dl)}${l.t?' · '+esc(l.t):''}</div>
       <div class="font-bold text-base truncate">${esc(l.who)}${tl?`<span class="text-[10px] font-bold ml-2 px-2 py-0.5 rounded-full" style="background:var(--honey-bg);color:var(--honey)">${tl}</span>`:''}</div></div>
-      ${isAdmin()?`<button onclick="A.delLog(${l.i})" class="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white shrink-0" title="Izbriši zapis">🗑️</button>`:''}
+      ${isAdmin()?`<div class="flex gap-1 shrink-0"><button onclick="A.editLog(${l.i})" class="text-xs px-2.5 py-1.5 rounded-lg bg-blue-600 text-white" title="Uredi zapis">✏️</button><button onclick="A.delLog(${l.i})" class="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white" title="Izbriši zapis">🗑️</button></div>`:''}
     </div>`;
   });
   if(!list.length)html=`<div class="text-center text-sm py-8" style="color:var(--muted)">${all.length?'Ni zapisov za izbrano osebo.':'Zgodovina je še prazna. Od zdaj naprej se beleži, kdo je kateri dan častil.'}</div>`;
@@ -910,9 +941,14 @@ function viewHistory(){
       <select id="mWho" class="inp">${S.team.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select>
       <label class="flex items-center gap-2 text-xs" style="color:var(--muted)"><input id="mCount" type="checkbox"> Prištej tudi k števcu rund</label>
       <button onclick="A.addLog()" class="b bg-blue-600 hover:bg-blue-500 w-full">➕ Dodaj zapis</button>
+      <button onclick="A.cleanLog()" class="b bg-slate-600 hover:bg-slate-500 w-full">🧹 Izbriši stare zapise …</button>
     </div></details>`:'';
+  const note=isAdmin()
+    ?`<p class="text-xs mb-3" style="color:var(--muted)">Kot skrbnik vidiš vse zapise (${all0.length}).${hd?` Uporabniki vidijo zadnjih ${hd} dni.`:' Uporabniki vidijo vse.'}</p>`
+    :(hd?`<p class="text-xs mb-3" style="color:var(--muted)">Prikazani so zapisi zadnjih ${hd} dni.</p>`:'');
   return `<div class="${card}">
     ${manual}
+    ${note}
     <div class="flex flex-wrap gap-1.5 mb-3">${chips}</div>
     <select class="inp mb-2" onchange="A.histF(this.value)"><option value="">Vsi sodelavci</option>${names.map(n=>`<option value="${esc(n)}" ${n===histFilter?'selected':''}>${esc(n)}</option>`).join('')}</select>
     ${html}</div>`;
@@ -1077,6 +1113,9 @@ function viewAdmin(){
         <div class="flex gap-2 mt-2"><input id="newInviteTime" type="text" inputmode="numeric" autocomplete="off" aria-label="Nova ura za predlog" placeholder="Npr. 12:20" class="inp" onkeydown="if(event.key==='Enter'){event.preventDefault();A.addInviteTime()}"><button type="button" onclick="A.addInviteTime()" class="b bg-blue-600">Dodaj</button></div>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Klikni predlog, da ga odstraniš. Spremembe potrdi z gumbom Shrani nastavitve. Polje v povabilu je vedno predizpolnjeno s trenutnim časom.</p>
       </div>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-3">
+      <label class="${lbl}">Zgodovina: koliko nazaj vidijo uporabniki<select id="s_histDays" class="inp mt-1">${[[0,'Vse'],[30,'Zadnjih 30 dni'],[90,'Zadnjih 90 dni'],[180,'Zadnjih 180 dni'],[365,'Zadnje leto']].map(([v,t])=>`<option value="${v}" ${(+CFG.histDays||0)===v?'selected':''}>${t}</option>`).join('')}</select></label>
     </div>
     <div class="grid sm:grid-cols-2 gap-3">
       <label class="${lbl}">Število stolpcev ekipe<select id="s_cols" class="inp mt-1">${['auto','2','3'].map(v=>`<option value="${v}" ${CFG.cols===v?'selected':''}>${v==='auto'?'Samodejno':v}</option>`).join('')}</select></label>
