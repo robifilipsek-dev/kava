@@ -298,11 +298,12 @@ function clearTodayPayerState(s){
   s.paid[payer] = false;
   s.todayPayer = null;
   // Števec zmanjšamo samo, če je bila runda res zabeležena (pay); ročna izbira skrbnika števca ni povečala.
-  if(s.log.length > 0){
-    const last = s.log[s.log.length - 1];
-    if(last.who === payer && last.d === today()){
-      s.log.pop();
+  for(let k = s.log.length - 1; k >= 0; k--){
+    const e = s.log[k];
+    if(e && e.who === payer && e.d === today() && e.type !== 'manual'){
+      s.log.splice(k, 1);
       if(s.counts[payer] > 0) s.counts[payer]--;
+      break;
     }
   }
   adv(s);
@@ -451,8 +452,8 @@ document.addEventListener('keydown',e=>{
 // ===== DEJANJA =====
 const A=window.A={
   ans(v){askVals={};document.querySelectorAll('#modal [data-k]').forEach(e=>{askVals[e.dataset.k]=e.value});document.getElementById('modal').innerHTML='';ansRes&&ansRes(v);ansRes=null},
-  tab(t){tab=t;render();scrollTo({top:0})},
-  toggleHist(){tab=(tab==='history'?'main':'history');render();scrollTo({top:0})},
+  tab(t){document.activeElement?.blur();tab=t;render();scrollTo({top:0})},
+  toggleHist(){document.activeElement?.blur();tab=(tab==='history'?'main':'history');render();scrollTo({top:0})},
   histF(v){histFilter=v;document.activeElement?.blur();render()},
   async editLog(i){
     if(!isAdmin())return;
@@ -494,9 +495,10 @@ const A=window.A={
     if(!(await ask('Izbris zapisa',`Izbrišem zapis: ${l.who}, ${l.d}?`,'Izbriši',inner)))return;
     const dec=askVals.c!=='0';
     run(s=>{const x=s.log[i];if(!x||x.d!==l.d||x.who!==l.who)return;s.log.splice(i,1);if(dec&&(s.counts[l.who]||0)>0)s.counts[l.who]--;
-      if(s.todayPayer===l.who&&l.d===today()&&!s.log.some(y=>y.d===today()&&y.who===l.who)){s.paid[l.who]=false;s.todayPayer=null}},'Zapis izbrisan.');
+      if(s.todayPayer===l.who&&l.d===today()&&!s.log.some(y=>y.d===today()&&y.who===l.who)){s.paid[l.who]=false;s.todayPayer=null;adv(s)}},'Zapis izbrisan.');
   },
   toggleAdmin(){
+    document.activeElement?.blur();
     tab = (tab === 'admin' ? 'main' : 'admin');
     render();
     scrollTo({top:0});
@@ -948,8 +950,6 @@ function viewHistory(){
     :(hd?`<p class="text-xs mb-3" style="color:var(--muted)">Prikazani so zapisi zadnjih ${hd} dni.</p>`:'');
   return `<div class="${card}">
     ${manual}
-    ${note}
-    <div class="flex flex-wrap gap-1.5 mb-3">${chips}</div>
     <select class="inp mb-2" onchange="A.histF(this.value)"><option value="">Vsi sodelavci</option>${names.map(n=>`<option value="${esc(n)}" ${n===histFilter?'selected':''}>${esc(n)}</option>`).join('')}</select>
     ${html}</div>`;
 }
