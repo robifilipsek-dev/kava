@@ -452,6 +452,7 @@ document.addEventListener('keydown',e=>{
 const A=window.A={
   ans(v){askVals={};document.querySelectorAll('#modal [data-k]').forEach(e=>{askVals[e.dataset.k]=e.value});document.getElementById('modal').innerHTML='';ansRes&&ansRes(v);ansRes=null},
   tab(t){tab=t;render();scrollTo({top:0})},
+  toggleHist(){tab=(tab==='history'?'main':'history');render();scrollTo({top:0})},
   histF(v){histFilter=v;document.activeElement?.blur();render()},
   async addLog(){
     if(!isAdmin())return;
@@ -780,7 +781,7 @@ function header(){
   ` : '';
 
   const histBtn = `
-    <button onclick="A.tab(tab==='history'?'main':'history')" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 transition flex items-center justify-center gap-1.5 text-xs text-white" title="Zgodovina častitev">
+    <button onclick="A.toggleHist()" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 transition flex items-center justify-center gap-1.5 text-xs text-white" title="Zgodovina častitev">
       ${tab==='history' ? '☕ <span class="hidden sm:inline font-semibold">Meni kava</span>' : '📜 <span class="hidden sm:inline font-semibold">Zgodovina</span>'}
     </button>`;
 
@@ -880,7 +881,7 @@ function viewMain(){
 
 let histFilter='';
 function viewHistory(){
-  const all=[...S.log].map((l,i)=>({...l,i})).sort((a,b)=>(b.d+(b.t||'')).localeCompare(a.d+(a.t||'')));
+  const all=[...S.log].map((l,i)=>({...l,i})).filter(l=>l&&typeof l.d==='string'&&l.d.includes('-')).sort((a,b)=>(b.d+(b.t||'')).localeCompare(a.d+(a.t||'')));
   const names=[...new Set([...S.team,...all.map(l=>l.who)])];
   if(histFilter&&!names.includes(histFilter))histFilter='';
   const list=histFilter?all.filter(l=>l.who===histFilter):all;
