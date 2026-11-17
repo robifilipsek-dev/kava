@@ -288,7 +288,7 @@ function pay(s,who,type,by,inTurn=true){
   const d=new Date();
   s.counts[who]++;s.paid[who]=true;s.todayPayer=who;s.unav[who]=false;
   s.log.push({d:today(),t:`${p(d.getHours())}:${p(d.getMinutes())}`,who,type,by});
-  if(s.log.length>100)s.log.splice(0,s.log.length-100);
+  if(s.log.length>2000)s.log.splice(0,s.log.length-2000);
   checkRound(s);if(inTurn)adv(s);
 }
 
@@ -452,6 +452,23 @@ document.addEventListener('keydown',e=>{
 const A=window.A={
   ans(v){askVals={};document.querySelectorAll('#modal [data-k]').forEach(e=>{askVals[e.dataset.k]=e.value});document.getElementById('modal').innerHTML='';ansRes&&ansRes(v);ansRes=null},
   tab(t){tab=t;render();scrollTo({top:0})},
+  histF(v){histFilter=v;document.activeElement?.blur();render()},
+  async addLog(){
+    if(!isAdmin())return;
+    const d=document.getElementById('mDate')?.value,w=document.getElementById('mWho')?.value,inc=!!document.getElementById('mCount')?.checked;
+    if(!d||!w)return toast('Izberi datum in osebo.','info');
+    if(d>today())return toast('Datum ne sme biti v prihodnosti.','info');
+    const ex=S.log.find(l=>l.d===d);
+    if(ex&&!(await ask('Zapis že obstaja',`Za ${d} je že zabeleženo: ${ex.who}. Dodam še en zapis?`,'Dodaj')))return;
+    run(s=>{s.log.push({d,t:'',who:w,type:'manual',by:who()});if(inc)s.counts[w]=(s.counts[w]||0)+1},'Zapis dodan.');
+  },
+  async delLog(i){
+    if(!isAdmin())return;
+    const l=S.log[i];if(!l)return;
+    if(!(await ask('Izbris zapisa',`Izbrišem zapis: ${l.who}, ${l.d}? Števec te osebe se zmanjša za 1.`,'Izbriši')))return;
+    run(s=>{const x=s.log[i];if(!x||x.d!==l.d||x.who!==l.who)return;s.log.splice(i,1);if((s.counts[l.who]||0)>0)s.counts[l.who]--;
+      if(s.todayPayer===l.who&&l.d===today()&&!s.log.some(y=>y.d===today()&&y.who===l.who)){s.paid[l.who]=false;s.todayPayer=null}},'Zapis izbrisan.');
+  },
   toggleAdmin(){
     tab = (tab === 'admin' ? 'main' : 'admin');
     render();
@@ -762,6 +779,11 @@ function header(){
     </button>
   ` : '';
 
+  const histBtn = `
+    <button onclick="A.tab(tab==='history'?'main':'history')" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 transition flex items-center justify-center gap-1.5 text-xs text-white" title="Zgodovina častitev">
+      ${tab==='history' ? '☕ <span class="hidden sm:inline font-semibold">Meni kava</span>' : '📜 <span class="hidden sm:inline font-semibold">Zgodovina</span>'}
+    </button>`;
+
   const userIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
 
   return `<header class="ios-nav sticky top-0 z-30"><div class="max-w-4xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
@@ -780,6 +802,7 @@ function header(){
       <button onclick="A.pick()" class="px-2.5 py-2 rounded-xl bg-kg border border-slate-700 text-slate-200 flex items-center justify-center gap-1.5 hover:bg-slate-800 transition max-w-[120px] sm:max-w-none" title="Zamenjaj osebo na seznamu">
         ${userIcon}<strong class="truncate max-w-[70px] sm:max-w-none">${esc(myName)}</strong>
       </button>
+      ${histBtn}
       ${adminBtn}
       <button onclick="A.logout()" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-red-900/60 transition flex items-center justify-center gap-1" title="Odjava">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
@@ -791,7 +814,7 @@ function header(){
 
 function hero(){
   const d=new Date().toLocaleDateString('sl-SI',{weekday:'long',day:'numeric',month:'long'});
-  return `<section class="ios-hero"><div class="hero-panel"><div class="hero-copy"><span class="kicker">ODMOR ZA KAVO</span><h1>${tab==='admin'?'Skrbniške nastavitve':'Kdo časti kavo?'}</h1><p class="capitalize">${esc(d)}</p></div><div class="hero-art">${coffeeArt}</div></div></section>`;
+  return `<section class="ios-hero"><div class="hero-panel"><div class="hero-copy"><span class="kicker">ODMOR ZA KAVO</span><h1>${tab==='admin'?'Skrbniške nastavitve':tab==='history'?'Zgodovina častitev':'Kdo časti kavo?'}</h1><p class="capitalize">${esc(d)}</p></div><div class="hero-art">${coffeeArt}</div></div></section>`;
 }
 
 function viewMain(){
@@ -853,6 +876,45 @@ function viewMain(){
   <div class="text-xs text-slate-500 dark:text-slate-400 mt-4 flex items-center justify-between">
     <span>Izbrana oseba s seznama: <strong class="text-slate-800 dark:text-slate-200">${esc(me&&S.team.includes(me)?me:'Niste izbrali osebe')}</strong></span>
     <span>${loaded?'✓ Sinhronizirano':'Nalaganje …'}</span></div>`;
+}
+
+let histFilter='';
+function viewHistory(){
+  const all=[...S.log].map((l,i)=>({...l,i})).sort((a,b)=>(b.d+(b.t||'')).localeCompare(a.d+(a.t||'')));
+  const names=[...new Set([...S.team,...all.map(l=>l.who)])];
+  if(histFilter&&!names.includes(histFilter))histFilter='';
+  const list=histFilter?all.filter(l=>l.who===histFilter):all;
+  const tally={};all.forEach(l=>{tally[l.who]=(tally[l.who]||0)+1});
+  const chips=`<span class="chip chip-t" style="display:inline-flex;align-items:center">Skupaj: ${all.length}</span>`+
+    Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<span class="chip chip-t" style="display:inline-flex;align-items:center">${esc(n)}: ${c}</span>`).join('');
+  const typeLbl={turn:'',invite:'⏰ povabilo',sponsor:'⭐ prostovoljno',manual:'✍️ ročno'};
+  let html='',lastM='';
+  list.forEach(l=>{
+    const [y,m,d]=l.d.split('-').map(Number);
+    const dt=new Date(y,m-1,d);
+    const ml=dt.toLocaleDateString('sl-SI',{month:'long',year:'numeric'});
+    if(ml!==lastM){html+=`<div class="text-xs font-bold uppercase tracking-widest mt-5 mb-2" style="color:var(--coffee)">${esc(ml)}</div>`;lastM=ml}
+    const dl=dt.toLocaleDateString('sl-SI',{weekday:'long',day:'numeric',month:'numeric',year:'numeric'});
+    const tl=typeLbl[l.type]||'';
+    html+=`<div class="ios-group flex items-center justify-between gap-2 px-3 py-2.5 mb-1.5">
+      <div class="min-w-0"><div class="text-xs capitalize" style="color:var(--muted)">${esc(dl)}${l.t?' · '+esc(l.t):''}</div>
+      <div class="font-bold text-base truncate">${esc(l.who)}${tl?`<span class="text-[10px] font-bold ml-2 px-2 py-0.5 rounded-full" style="background:var(--honey-bg);color:var(--honey)">${tl}</span>`:''}</div></div>
+      ${isAdmin()?`<button onclick="A.delLog(${l.i})" class="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white shrink-0" title="Izbriši zapis">🗑️</button>`:''}
+    </div>`;
+  });
+  if(!list.length)html=`<div class="text-center text-sm py-8" style="color:var(--muted)">${all.length?'Ni zapisov za izbrano osebo.':'Zgodovina je še prazna. Od zdaj naprej se beleži, kdo je kateri dan častil.'}</div>`;
+  const manual=isAdmin()?`<details class="ios-group mb-3 px-3 py-2.5"><summary class="cursor-pointer select-none font-semibold text-sm">✍️ Ročni vnos (skrbnik)</summary>
+    <div class="mt-3 space-y-2">
+      <input id="mDate" type="date" class="inp" max="${today()}" value="${today()}">
+      <select id="mWho" class="inp">${S.team.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select>
+      <label class="flex items-center gap-2 text-xs" style="color:var(--muted)"><input id="mCount" type="checkbox"> Prištej tudi k števcu rund</label>
+      <button onclick="A.addLog()" class="b bg-blue-600 hover:bg-blue-500 w-full">➕ Dodaj zapis</button>
+    </div></details>`:'';
+  return `<div class="${card}">
+    ${manual}
+    <div class="flex flex-wrap gap-1.5 mb-3">${chips}</div>
+    <select class="inp mb-2" onchange="A.histF(this.value)"><option value="">Vsi sodelavci</option>${names.map(n=>`<option value="${esc(n)}" ${n===histFilter?'selected':''}>${esc(n)}</option>`).join('')}</select>
+    ${html}</div>`;
 }
 
 function helpView(){
@@ -1051,8 +1113,8 @@ function render(){
   const app=document.getElementById('app');
   if(!user){app.innerHTML=loginView();return}
   if(tab==='admin'&&!noSync)syncMsgs();noSync=false;
-  if(tab==='admin'&&document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)&&app.contains(document.activeElement))return;
-  const body = tab==='admin' && isAdmin() ? viewAdmin() : viewMain();
+  if((tab==='admin'||tab==='history')&&document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)&&app.contains(document.activeElement))return;
+  const body = tab==='admin' && isAdmin() ? viewAdmin() : tab==='history' ? viewHistory() : viewMain();
   app.innerHTML=`${header()}${hero()}<main class="max-w-4xl mx-auto px-4 py-5">
     ${CFG.notice?`<div class="mb-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm">ℹ️ ${esc(CFG.notice)}</div>`:''}
     ${body}</main>`;
